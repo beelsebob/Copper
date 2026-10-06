@@ -46,6 +46,7 @@ public:
     bool valid() const { return _id >= 0; }
     void reset() {
         if (_id >= 0 && _closer != nullptr) {
+            std::lock_guard lock(hdf5ApiMutex());
             _closer(_id);
         }
         _id = -1;
@@ -216,6 +217,7 @@ FieldFrameSeriesWriter::~FieldFrameSeriesWriter() {
 std::expected<FieldFrameSeriesWriter, std::string> FieldFrameSeriesWriter::create(const std::filesystem::path& path,
                                                                                      const Header& header,
                                                                                      std::uint32_t chunkFrames) {
+    std::lock_guard hdf5Lock(hdf5ApiMutex());
     if (header.nx == 0 || header.ny == 0 || header.nz == 0) {
         return std::unexpected("FieldFrameSeriesWriter::create: nx/ny/nz must all be non-zero");
     }
@@ -445,6 +447,7 @@ std::expected<void, std::string> FieldFrameSeriesWriter::writeFrame(std::uint32_
                                                                         const std::vector<float>& hx,
                                                                         const std::vector<float>& hy,
                                                                         const std::vector<float>& hz) {
+    std::lock_guard hdf5Lock(hdf5ApiMutex());
     if (!_impl || _impl->closed) {
         return std::unexpected("FieldFrameSeriesWriter::writeFrame called after close()");
     }
@@ -679,6 +682,7 @@ std::expected<void, std::string> FieldFrameSeriesWriter::writeFrame(std::uint32_
 }
 
 std::expected<void, std::string> FieldFrameSeriesWriter::close() {
+    std::lock_guard hdf5Lock(hdf5ApiMutex());
     if (!_impl || _impl->closed) {
         return {};
     }

@@ -1,11 +1,18 @@
 #pragma once
 
 #include <expected>
+#include <mutex>
 #include <string>
 
 #include <hdf5.h>
 
 namespace copper {
+
+/// Serializes all access to this process's HDF5 library. The framework can keep several SWMR
+/// readers open while its writer publishes another frame, so this must be shared by every reader
+/// and writer rather than being local to one file handle. It is recursive because RAII cleanup can
+/// re-enter HDF5 while a public operation already holds the boundary.
+std::recursive_mutex& hdf5ApiMutex();
 
 /// Registers the standard HDF5 Blosc2 filter id (32026) in-process. The implementation uses
 /// Blosc2's LZ4 codec at clevel 1 with bitshuffle and its internal worker pool. Registering it

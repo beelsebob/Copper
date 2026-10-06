@@ -58,6 +58,7 @@ public:
     bool valid() const { return _id >= 0; }
     void reset() {
         if (_id >= 0 && _closer != nullptr) {
+            std::lock_guard lock(hdf5ApiMutex());
             _closer(_id);
         }
         _id = -1;
@@ -216,10 +217,6 @@ struct FieldFrameSeriesReader::Impl {
     // decode into local storage without holding this lock, so a cached foreground read remains
     // available throughout that work.
     mutable std::mutex mutex;
-    // HDF5 dataset handles may be touched by refresh(), a foreground cache miss, and background
-    // prefetch. Keep those operations serialized independently of the cheap cache bookkeeping.
-    mutable std::mutex hdf5Mutex;
-
     std::expected<void, std::string> loadPublishedMetadata(std::uint32_t newFrameCount) {
         if (newFrameCount < frameCount) {
             return std::unexpected("Field-frame published count moved backwards");
@@ -315,7 +312,7 @@ struct FieldFrameSeriesReader::Impl {
     std::expected<void, std::string> decodeFrame(std::uint32_t frameIndex,
                                                   std::uint32_t availableFrameCount,
                                                   std::array<std::vector<float>, 6>& outComponents) const {
-        std::lock_guard hdf5Lock(hdf5Mutex);
+        std::lock_guard hdf5Lock(hdf5ApiMutex());
         const std::size_t cellCount = static_cast<std::size_t>(header.nx) * header.ny * header.nz;
         if (frameIndex >= availableFrameCount) {
             return std::unexpected("Field frame is outside the published range");
@@ -384,7 +381,7 @@ struct FieldFrameSeriesReader::Impl {
     std::expected<void, std::string> decodePreviewFrame(
         std::uint32_t frameIndex, std::uint32_t availableFrameCount, std::vector<float>& energy,
         std::array<std::vector<float>*, 6> outputs) const {
-        std::lock_guard hdf5Lock(hdf5Mutex);
+        std::lock_guard hdf5Lock(hdf5ApiMutex());
         if (frameIndex >= availableFrameCount) return std::unexpected("Preview frame is outside the published range");
         const std::size_t count = static_cast<std::size_t>(previewHeader.nx) * previewHeader.ny * previewHeader.nz;
         const hsize_t start[4] = {frameIndex, 0, 0, 0};
@@ -416,6 +413,7 @@ FieldFrameSeriesReader& FieldFrameSeriesReader::operator=(FieldFrameSeriesReader
 FieldFrameSeriesReader::~FieldFrameSeriesReader() = default;
 
 std::expected<FieldFrameSeriesReader, std::string> FieldFrameSeriesReader::open(const std::filesystem::path& path) {
+    std::lock_guard hdf5Lock(hdf5ApiMutex());
     if (auto registered = registerHDF5Blosc2Filter(); !registered) {
         return std::unexpected(registered.error());
     }
@@ -607,9 +605,9 @@ std::uint32_t FieldFrameSeriesReader::previewFactorX() const { return _impl->pre
 std::uint32_t FieldFrameSeriesReader::previewFactorY() const { return _impl->previewFactorY; }
 std::uint32_t FieldFrameSeriesReader::previewFactorZ() const { return _impl->previewFactorZ; }
 std::expected<std::uint32_t, std::string> FieldFrameSeriesReader::refresh() const {
-    // Take the HDF5 lock first, without excluding cached reads while waiting for an in-progress
-    // prefetch. No other path holds the cache mutex while acquiring hdf5Mutex.
-    std::lock_guard hdf5Lock(_impl->hdf5Mutex);
+    // Take the process-wide HDF5 lock first, without excluding cached reads while waiting for an
+    // in-progress prefetch. No other path holds the cache mutex while acquiring this lock.
+    std::lock_guard hdf5Lock(hdf5ApiMutex());
     std::lock_guard lock(_impl->mutex);
     return _impl->refreshPublishedFrames();
 }
@@ -691,6 +689,7 @@ std::expected<void, std::string> FieldFrameSeriesReader::readPreviewFrame(
 
 std::expected<std::vector<std::uint32_t>, std::string>
 FieldFrameSeriesReader::readRefinementOrder(std::uint32_t frameIndex) const {
+    std::lock_guard hdf5Lock(hdf5ApiMutex());
     Impl& impl = *_impl;
     {
         std::lock_guard lock(impl.mutex);
@@ -704,7 +703,6 @@ FieldFrameSeriesReader::readRefinementOrder(std::uint32_t frameIndex) const {
     const hsize_t start[2] = {frameIndex, 0};
     const hsize_t count[2] = {1, previewCellCount};
     HId memspace(H5Screate_simple(2, count, nullptr), H5Sclose);
-    std::lock_guard hdf5Lock(impl.hdf5Mutex);
     HId filespace(H5Dget_space(impl.refinementOrder.get()), H5Sclose);
     if (!filespace.valid() || !memspace.valid() ||
         H5Sselect_hyperslab(filespace.get(), H5S_SELECT_SET, start, nullptr, count, nullptr) < 0 ||
@@ -799,7 +797,7 @@ FieldFrameSeriesReader::readPreviewCellDetails(
     // HDF5 object access remains serialized for SWMR safety, but only long enough to copy each
     // compressed chunk. The expensive Blosc2 decode happens below, outside this lock.
     {
-        std::lock_guard hdf5Lock(impl.hdf5Mutex);
+        std::lock_guard hdf5Lock(hdf5ApiMutex());
         for (std::size_t tileIndex = 0; tileIndex < previewCellIndices.size(); ++tileIndex) {
             const std::uint32_t cell = previewCellIndices[tileIndex];
             const std::uint32_t px = cell % impl.previewHeader.nx;
@@ -940,7 +938,6 @@ std::expected<void, std::string> FieldFrameSeriesReader::readRegion(
     HId memspace(H5Screate_simple(4, count, nullptr), H5Sclose);
     if (!memspace.valid()) return std::unexpected("Could not create field detail memory space");
     std::array<std::vector<float>*, 6> outputs = {&ex, &ey, &ez, &hx, &hy, &hz};
-    std::lock_guard hdf5Lock(impl.hdf5Mutex);
     const std::uint32_t previewX = x / impl.previewFactorX;
     const std::uint32_t previewY = y / impl.previewFactorY;
     const std::uint32_t previewZ = z / impl.previewFactorZ;

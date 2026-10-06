@@ -232,7 +232,14 @@ const H5Z_class2_t kBlosc2Filter = {
 
 } // namespace
 
+std::recursive_mutex& hdf5ApiMutex() {
+    // HDF5 can close handles during process teardown. Keep this alive for such destructor paths.
+    static auto* mutex = new std::recursive_mutex;
+    return *mutex;
+}
+
 std::expected<void, std::string> registerHDF5Blosc2Filter() {
+    std::lock_guard lock(hdf5ApiMutex());
     static std::once_flag once;
     static herr_t registrationResult = -1;
     std::call_once(once, [] { registrationResult = H5Zregister(&kBlosc2Filter); });
@@ -243,6 +250,7 @@ std::expected<void, std::string> registerHDF5Blosc2Filter() {
 }
 
 std::expected<void, std::string> setHDF5Blosc2Filter(hid_t dcpl) {
+    std::lock_guard lock(hdf5ApiMutex());
     if (auto registered = registerHDF5Blosc2Filter(); !registered) {
         return registered;
     }
