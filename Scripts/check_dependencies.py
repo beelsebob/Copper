@@ -3,8 +3,10 @@
 the versions the Xcode project expects, and that its git submodules are checked out. Offers to
 install anything missing, after asking. Missing formulas are errors; version mismatches are warnings.
 
-Usage: Scripts/check_dependencies.py [--yes]
+Usage: Scripts/check_dependencies.py [--yes] [--ssh]
   --yes   answer "yes" to every prompt (for unattended setup)
+  --ssh   fetch GitHub submodules over ssh (git@github.com:) instead of https; this is recorded in
+          the clone's local git config, and a later run without --ssh switches back to https
 
 On success writes the untracked Config/DependenciesChecked.generated.h; until it exists every
 Xcode compile stops with an #error from Config/DependencyCheck.h. The script never runs from Xcode.
