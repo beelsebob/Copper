@@ -1,0 +1,6 @@
+build/
+xcuserdata/
+__pycache__/
+*.profraw
+/Config/BuildPaths.local.xcconfig
+/Config/DependenciesChecked.generated.h

@@ -1,0 +1,1344 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04B2B86F983C8C5A023DC90A /* CSPrimPolygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CCE6EA719787E74EB283C77C /* CSPrimPolygon.cpp */; };
+		0560A9A5F313EC206E39CB19 /* libCopperUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */; };
+		0B4414645139F4079F0425F2 /* fparser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2FAAD97A992A4EF608EE81B2 /* fparser.cc */; };
+		15B71A1A31538C5A4D47DDD6 /* CSModeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19107B02DF5B2334DFE2F7DB /* CSModeData.cpp */; };
+		1BDB3D5F5771515E9FC5EF7E /* tinystr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 645482BE133775AD0FEBA242 /* tinystr.cpp */; };
+		1BDBB50043583C924CC60B69 /* CSPropLorentzMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42BD6262E25FB3CA48DC0521 /* CSPropLorentzMaterial.cpp */; };
+		1CD4FD1DD6F27522E8A763DC /* CSPrimPolyhedron.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55D034266EC70D8C6EBE4621 /* CSPrimPolyhedron.cpp */; };
+		1F0B10E31305467EFE5AF213 /* CSPropConductingSheet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C632AFE5B95D415966502B2 /* CSPropConductingSheet.cpp */; };
+		2B28A64197EC34386A462A87 /* ParameterCoord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24B7335A2F71AEA6CA923AA9 /* ParameterCoord.cpp */; };
+		338991977E432253F5624470 /* CSPropDumpBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49380B939918173C5E163869 /* CSPropDumpBox.cpp */; };
+		3D1271193BE7F28210A32DC5 /* ContinuousStructure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2451E7CD12BD31F3818F94CE /* ContinuousStructure.cpp */; };
+		46D666BC9696E9651FCFEE31 /* libCSXCAD.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */; };
+		4CB26506BBA7E1DF51710EA0 /* CSPropMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35E032FD12157DD7436C060B /* CSPropMaterial.cpp */; };
+		4E5B0B1E62A9ACE0E3A67968 /* CSProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49663DFBA7D26ACD3593530A /* CSProperties.cpp */; };
+		4F0654CC2396B2A98E427EB2 /* CSPrimSphericalShell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53E42EE90820060F11B96EFB /* CSPrimSphericalShell.cpp */; };
+		509ABB995FDD2894AD97FA11 /* CSPropProbeBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2941FAC6E5079B742EA0677D /* CSPropProbeBox.cpp */; };
+		548FA834261D5A56090B9EA2 /* CSPrimSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 582E95673AF775E7C5A4EBEE /* CSPrimSphere.cpp */; };
+		54A8C107A2BE3850E7AD014B /* CSFunctionParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C8AB067F9A2BFC5184D54DD /* CSFunctionParser.cpp */; };
+		5B13B6D149D66B0CDC7F1E5F /* CSPropUnknown.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 621B998B5A6FAD0B88C1FA5C /* CSPropUnknown.cpp */; };
+		5B2B2E719D953507E90FA2CB /* CSRectGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D09307B1321F43E7A6B24545 /* CSRectGrid.cpp */; };
+		5D058B8AEACE7C4CC74982FD /* CSPropDispersiveMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 99BBF1C2A91DE6F8F90AD7C9 /* CSPropDispersiveMaterial.cpp */; };
+		5D63EC94AAAABA835D80AD23 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */; };
+		5DB92BABCB73E13DED4FEF42 /* ParameterObjects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DC26131EC2F82F313F707C9 /* ParameterObjects.cpp */; };
+		600611418B043A403CFAA81D /* CSPrimWire.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8EE7A287292801D969EBEE8 /* CSPrimWire.cpp */; };
+		62805560624895BE2386B34E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */; };
+		6289F839B13DD503D9DD5F82 /* CSPropDiscMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 62E84E2F8D9CDD378F82B722 /* CSPropDiscMaterial.cpp */; };
+		628E926FB70334167AA6A82C /* CSPrimMultiBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7DA55CD8B8F43603CBF7440 /* CSPrimMultiBox.cpp */; };
+		6508E1AC850EE3C9D7CBA455 /* CSPropLumpedElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DDD0FCF16EEA1323AE2971 /* CSPropLumpedElement.cpp */; };
+		66E58DD2CEF76934C15168FA /* CSPropDebyeMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7019BD9D40D2F7B488141B47 /* CSPropDebyeMaterial.cpp */; };
+		6C75C637755647DDC99161F9 /* CSPrimCylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7AF409E4E579731AAE2D895E /* CSPrimCylinder.cpp */; };
+		74E2D8EF6E322BE704C47559 /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F92AECB98E3B94079636305 /* tinyxml.cpp */; };
+		798E98E43B14B0F1B36C5243 /* libCopperUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */; };
+		7E592664D42967B0D22589FE /* CSObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 392A5304AAD3B0B36A195A28 /* CSObject.cpp */; };
+		827DA68E750A7B408EA42267 /* CSPrimBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5275AED038D13ECAAD4B5BBB /* CSPrimBox.cpp */; };
+		8A7C4526A1B0E8DD3B16DC03 /* CSPrimRotPoly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4F576FAAAAF9DD769E4F417 /* CSPrimRotPoly.cpp */; };
+		949750C162BE7358F4658DCD /* CSPropMetal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 659582DF355BC23285681D28 /* CSPropMetal.cpp */; };
+		99C5BDC165596DCE680D8546 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */; };
+		9BEF0DEE4F00C103AC5E4D16 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4CBA74CF3B707715FE6898 /* tinyxmlparser.cpp */; };
+		9CB4CC37F5DD0F0E4D814CCF /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0E6900AA5EA8F88D90AEA6C /* Accelerate.framework */; };
+		A032922B535CB11035EFD37A /* CSPropExcitation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E5374364FF616CAF2E4CEF11 /* CSPropExcitation.cpp */; };
+		A2FFB4D6253A22B65F2FFE3D /* Copper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91EC4B2021EEA20F36C13E8 /* Copper.framework */; };
+		A72DA55D4BB947D401CF90CC /* CSPrimitives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14403A9D7934B6D535ECEEEA /* CSPrimitives.cpp */; };
+		A76F16654E811644DA4D8F4E /* CSPrimUserDefined.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10A0633C3052ADF6DB48645B /* CSPrimUserDefined.cpp */; };
+		ACED1480CBA2AE28153FEA9E /* CSPrimPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6894DAA01911257A836872F /* CSPrimPoint.cpp */; };
+		B26D3E41B8AA3DC2A5FB6DA8 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88E41EBB8BD36FF23AA0C199 /* Metal.framework */; };
+		B6DE86419517456A7967274A /* CSPrimPolyhedronReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B7203E9A456149DB8FB9B633 /* CSPrimPolyhedronReader.cpp */; };
+		BB13EEF6C3174AFAD62548EA /* CSPropResBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAC355CC2A5EC58DE3DB901 /* CSPropResBox.cpp */; };
+		C50529848E056E3A52942D24 /* fpoptimizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 33AB50487990E79E3018A3BE /* fpoptimizer.cc */; };
+		C9DD33EA8887024C8CEB9BC4 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6EA5DB87FF6E02B73427F10F /* tinyxmlerror.cpp */; };
+		CCC56DD58C04AC99C0E9E174 /* CSPropAbsorbingBC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3E45A17E6C81E9F1E8851729 /* CSPropAbsorbingBC.cpp */; };
+		D0EE99D8F60401BE348D23A7 /* CSPrimLinPoly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED32FE3385B357DB995A992 /* CSPrimLinPoly.cpp */; };
+		D4349EA9904C838480776FCA /* CSPrimCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD8AEEE6A9823DF442C7CA2B /* CSPrimCurve.cpp */; };
+		D936249311D82577FC9686CB /* CSPrimCylindricalShell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AB9A94C62AE5115902EDA /* CSPrimCylindricalShell.cpp */; };
+		DD97080C84BB30A0720C75BC /* libCSXCAD.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */; };
+		E4184CC82B9F9EA2C02933F3 /* CSTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09DDE61CE07C7206D4338495 /* CSTransform.cpp */; };
+		E5299B11E9C8848E00AD5152 /* CSBackgroundMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B68DE0FB3FC06117F6CB6E96 /* CSBackgroundMaterial.cpp */; };
+		EABA01871574BD330EFC2B5D /* CSSpatialIndex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 373F49427E55B9CD2B6D0100 /* CSSpatialIndex.cpp */; };
+		F7E70C035A56A1EE3D83A307 /* CSUseful.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E85D2C7AFD6BC42B1023E25 /* CSUseful.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		07188A4F62E6B3A39248E172 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 547F02E1E022D27E93E11471 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 436BD46808618ED0B9E3983D;
+			remoteInfo = CSXCAD;
+		};
+		3C478C143279D7327D2BF381 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 547F02E1E022D27E93E11471 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A8AA87DCFAFA02E03A63665;
+			remoteInfo = CopperUtils;
+		};
+		486E71F7767DADF5656D923F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 547F02E1E022D27E93E11471 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3818463DDAC498C89C93C21E;
+			remoteInfo = Copper;
+		};
+		C15B021A7B7AA6F3DA9F0737 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 547F02E1E022D27E93E11471 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 436BD46808618ED0B9E3983D;
+			remoteInfo = CSXCAD;
+		};
+		EDEA6E8B59FAE0D9C7373815 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 547F02E1E022D27E93E11471 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A8AA87DCFAFA02E03A63665;
+			remoteInfo = CopperUtils;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		03185B6902536DCAA50768FD /* CSFunctionParser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSFunctionParser.h; sourceTree = "<group>"; };
+		03B6926C29EEC0D3C1AFA5F9 /* CSPropDebyeMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropDebyeMaterial.h; sourceTree = "<group>"; };
+		080BBEFB571677E8C30ABF9F /* tinystr.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = tinystr.h; sourceTree = "<group>"; };
+		0978DDBB26D87F4D3269A240 /* CSModeData.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSModeData.h; sourceTree = "<group>"; };
+		09DDE61CE07C7206D4338495 /* CSTransform.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSTransform.cpp; sourceTree = "<group>"; };
+		0B99F0A4120DF79FB7436D9C /* CSRectGrid.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSRectGrid.h; sourceTree = "<group>"; };
+		10A0633C3052ADF6DB48645B /* CSPrimUserDefined.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimUserDefined.cpp; sourceTree = "<group>"; };
+		1152C919AFA2239F71623B17 /* CSPrimWire.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimWire.h; sourceTree = "<group>"; };
+		14403A9D7934B6D535ECEEEA /* CSPrimitives.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimitives.cpp; sourceTree = "<group>"; };
+		19107B02DF5B2334DFE2F7DB /* CSModeData.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSModeData.cpp; sourceTree = "<group>"; };
+		1C8AB067F9A2BFC5184D54DD /* CSFunctionParser.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSFunctionParser.cpp; sourceTree = "<group>"; };
+		1D3C154A86426B644D3566C7 /* BuildPaths.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = BuildPaths.xcconfig; sourceTree = "<group>"; };
+		2451E7CD12BD31F3818F94CE /* ContinuousStructure.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ContinuousStructure.cpp; sourceTree = "<group>"; };
+		24B7335A2F71AEA6CA923AA9 /* ParameterCoord.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParameterCoord.cpp; sourceTree = "<group>"; };
+		26A87F78304BB1DF829ECF5B /* CSUseful.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSUseful.h; sourceTree = "<group>"; };
+		2941FAC6E5079B742EA0677D /* CSPropProbeBox.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropProbeBox.cpp; sourceTree = "<group>"; };
+		2E6CC06E9F87669481746998 /* CSPrimSphere.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimSphere.h; sourceTree = "<group>"; };
+		2E85D2C7AFD6BC42B1023E25 /* CSUseful.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSUseful.cpp; sourceTree = "<group>"; };
+		2FAAD97A992A4EF608EE81B2 /* fparser.cc */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser.cc; sourceTree = "<group>"; };
+		31DDD0FCF16EEA1323AE2971 /* CSPropLumpedElement.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropLumpedElement.cpp; sourceTree = "<group>"; };
+		33AB50487990E79E3018A3BE /* fpoptimizer.cc */ = {isa = PBXFileReference; includeInIndex = 1; path = fpoptimizer.cc; sourceTree = "<group>"; };
+		35E032FD12157DD7436C060B /* CSPropMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropMaterial.cpp; sourceTree = "<group>"; };
+		35E23CA6597761F2C26CE848 /* CSPrimPoint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPoint.h; sourceTree = "<group>"; };
+		373F49427E55B9CD2B6D0100 /* CSSpatialIndex.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSSpatialIndex.cpp; sourceTree = "<group>"; };
+		38B79C72EA44BFFD79CA927F /* CSPrimPolyhedron_p.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPolyhedron_p.h; sourceTree = "<group>"; };
+		392A5304AAD3B0B36A195A28 /* CSObject.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSObject.cpp; sourceTree = "<group>"; };
+		3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCSXCAD.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		3E45A17E6C81E9F1E8851729 /* CSPropAbsorbingBC.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropAbsorbingBC.cpp; sourceTree = "<group>"; };
+		3EFA9B9172395C8119BF1347 /* CSPropConductingSheet.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropConductingSheet.h; sourceTree = "<group>"; };
+		3FAC355CC2A5EC58DE3DB901 /* CSPropResBox.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropResBox.cpp; sourceTree = "<group>"; };
+		42BD6262E25FB3CA48DC0521 /* CSPropLorentzMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropLorentzMaterial.cpp; sourceTree = "<group>"; };
+		459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		49380B939918173C5E163869 /* CSPropDumpBox.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropDumpBox.cpp; sourceTree = "<group>"; };
+		49663DFBA7D26ACD3593530A /* CSProperties.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSProperties.cpp; sourceTree = "<group>"; };
+		4A10D5DBF92E4608A44E3859 /* CSPropMetal.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropMetal.h; sourceTree = "<group>"; };
+		4C632AFE5B95D415966502B2 /* CSPropConductingSheet.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropConductingSheet.cpp; sourceTree = "<group>"; };
+		506C9F0B0A5C036B89497B1B /* ContinuousStructure.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ContinuousStructure.h; sourceTree = "<group>"; };
+		50DA849D124607C4D7B1A46C /* CopperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CopperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5136D2932F001C3BD6439D33 /* CSPropAbsorbingBC.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropAbsorbingBC.h; sourceTree = "<group>"; };
+		5275AED038D13ECAAD4B5BBB /* CSPrimBox.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimBox.cpp; sourceTree = "<group>"; };
+		53E42EE90820060F11B96EFB /* CSPrimSphericalShell.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimSphericalShell.cpp; sourceTree = "<group>"; };
+		55D034266EC70D8C6EBE4621 /* CSPrimPolyhedron.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimPolyhedron.cpp; sourceTree = "<group>"; };
+		582E95673AF775E7C5A4EBEE /* CSPrimSphere.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimSphere.cpp; sourceTree = "<group>"; };
+		584C879469B3A4EBDAA60A67 /* CSPropDiscMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropDiscMaterial.h; sourceTree = "<group>"; };
+		5C0AB9A94C62AE5115902EDA /* CSPrimCylindricalShell.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimCylindricalShell.cpp; sourceTree = "<group>"; };
+		5C896CA840676E229D619DA3 /* CSPrimPolygon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPolygon.h; sourceTree = "<group>"; };
+		5DC26131EC2F82F313F707C9 /* ParameterObjects.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParameterObjects.cpp; sourceTree = "<group>"; };
+		5ED73BABAA0671F6FCD02983 /* fparser_gmpint.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser_gmpint.hh; sourceTree = "<group>"; };
+		621B998B5A6FAD0B88C1FA5C /* CSPropUnknown.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropUnknown.cpp; sourceTree = "<group>"; };
+		62E84E2F8D9CDD378F82B722 /* CSPropDiscMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropDiscMaterial.cpp; sourceTree = "<group>"; };
+		645482BE133775AD0FEBA242 /* tinystr.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = tinystr.cpp; sourceTree = "<group>"; };
+		659582DF355BC23285681D28 /* CSPropMetal.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropMetal.cpp; sourceTree = "<group>"; };
+		68CA3F597AA62E0B5732A2D3 /* CSPropLumpedElement.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropLumpedElement.h; sourceTree = "<group>"; };
+		6EA5DB87FF6E02B73427F10F /* tinyxmlerror.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlerror.cpp; sourceTree = "<group>"; };
+		7019BD9D40D2F7B488141B47 /* CSPropDebyeMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropDebyeMaterial.cpp; sourceTree = "<group>"; };
+		753D0C79263BE7D365068E5B /* CSPrimRotPoly.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimRotPoly.h; sourceTree = "<group>"; };
+		79E9BE38335DB9DB3CAFD9AC /* CSPropDispersiveMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropDispersiveMaterial.h; sourceTree = "<group>"; };
+		7A026BC10D4E6EBFBDA8C7E6 /* copper_field_storage_experiments.md */ = {isa = PBXFileReference; includeInIndex = 1; path = copper_field_storage_experiments.md; sourceTree = "<group>"; };
+		7AF409E4E579731AAE2D895E /* CSPrimCylinder.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimCylinder.cpp; sourceTree = "<group>"; };
+		7BCB52FBE0FB964B0641E104 /* ParameterCoord.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParameterCoord.h; sourceTree = "<group>"; };
+		7E00681EF23C96E69CD24446 /* CSPropProbeBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropProbeBox.h; sourceTree = "<group>"; };
+		7F92AECB98E3B94079636305 /* tinyxml.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml.cpp; sourceTree = "<group>"; };
+		829A139D8DACEC6B975E19F8 /* field_frame_series_format.md */ = {isa = PBXFileReference; includeInIndex = 1; path = field_frame_series_format.md; sourceTree = "<group>"; };
+		835733E2D242DE2DBCB24030 /* CSPrimMultiBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimMultiBox.h; sourceTree = "<group>"; };
+		841D0FB5789F0F1C8C57EB75 /* CSPrimCylindricalShell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimCylindricalShell.h; sourceTree = "<group>"; };
+		869E97FF3C1F876E3F9EB9BA /* CSPrimSphericalShell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimSphericalShell.h; sourceTree = "<group>"; };
+		880C07DB3F1B466A53EC22FA /* CSPrimitives.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimitives.h; sourceTree = "<group>"; };
+		88E41EBB8BD36FF23AA0C199 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
+		8B4CBA74CF3B707715FE6898 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
+		905F8F778476EC74B388004E /* CSXCAD_Global.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSXCAD_Global.h; sourceTree = "<group>"; };
+		90FCD26FCB648BDA291AC8B1 /* CSSpatialIndex.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSSpatialIndex.h; sourceTree = "<group>"; };
+		98C7122D015AE3BADACBBDC2 /* CSPrimCurve.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimCurve.h; sourceTree = "<group>"; };
+		99BBF1C2A91DE6F8F90AD7C9 /* CSPropDispersiveMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropDispersiveMaterial.cpp; sourceTree = "<group>"; };
+		9A509E087A2B76CF08E3BEEA /* CSProperties.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSProperties.h; sourceTree = "<group>"; };
+		9E9CC1FE59139E67CF7E70B3 /* CSPrimCylinder.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimCylinder.h; sourceTree = "<group>"; };
+		9ED32FE3385B357DB995A992 /* CSPrimLinPoly.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimLinPoly.cpp; sourceTree = "<group>"; };
+		A0E6900AA5EA8F88D90AEA6C /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
+		A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCopperUtils.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA17D884E3FFD300A56BD57B /* CSXCADLogging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSXCADLogging.h; sourceTree = "<group>"; };
+		AA23E245E89A6CE7E53BA045 /* fpconfig.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fpconfig.hh; sourceTree = "<group>"; };
+		ADB7AFD53555E82B112ED67E /* CSPrimPolyhedronReader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPolyhedronReader.h; sourceTree = "<group>"; };
+		B4612EC255D295111FB95110 /* DependencyCheck.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DependencyCheck.h; sourceTree = "<group>"; };
+		B4F576FAAAAF9DD769E4F417 /* CSPrimRotPoly.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimRotPoly.cpp; sourceTree = "<group>"; };
+		B4FA74C7B7B284D5CBBB01C5 /* CSPropLorentzMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropLorentzMaterial.h; sourceTree = "<group>"; };
+		B5324AD08DD439C74D8E4162 /* CSPropMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropMaterial.h; sourceTree = "<group>"; };
+		B5458AECDDD4770A6F36564B /* tinyxml.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = tinyxml.h; sourceTree = "<group>"; };
+		B68DE0FB3FC06117F6CB6E96 /* CSBackgroundMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSBackgroundMaterial.cpp; sourceTree = "<group>"; };
+		B7203E9A456149DB8FB9B633 /* CSPrimPolyhedronReader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimPolyhedronReader.cpp; sourceTree = "<group>"; };
+		B8EE7A287292801D969EBEE8 /* CSPrimWire.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimWire.cpp; sourceTree = "<group>"; };
+		B93DBDD97C7AA58C5E249794 /* CSPropDumpBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropDumpBox.h; sourceTree = "<group>"; };
+		BC6D3573C7FB15044236A080 /* CSPropResBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropResBox.h; sourceTree = "<group>"; };
+		BD8AEEE6A9823DF442C7CA2B /* CSPrimCurve.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimCurve.cpp; sourceTree = "<group>"; };
+		C02930E4233F720191946A92 /* CSObject.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSObject.h; sourceTree = "<group>"; };
+		C3969925EBD045A8743AD587 /* fparser_mpfr.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser_mpfr.hh; sourceTree = "<group>"; };
+		C9B1607C31917DAEA552D93C /* CSPrimBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimBox.h; sourceTree = "<group>"; };
+		CC195ABA9749F0A1F741A458 /* CSPropExcitation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropExcitation.h; sourceTree = "<group>"; };
+		CCC715505E3820CE055416B0 /* CSBackgroundMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSBackgroundMaterial.h; sourceTree = "<group>"; };
+		CCE6EA719787E74EB283C77C /* CSPrimPolygon.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimPolygon.cpp; sourceTree = "<group>"; };
+		D09307B1321F43E7A6B24545 /* CSRectGrid.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSRectGrid.cpp; sourceTree = "<group>"; };
+		D2B543061B247AAEB046FC4D /* CSPrimLinPoly.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimLinPoly.h; sourceTree = "<group>"; };
+		D7CC1595E4CB5473475095EE /* fparser.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser.hh; sourceTree = "<group>"; };
+		D7DA55CD8B8F43603CBF7440 /* CSPrimMultiBox.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimMultiBox.cpp; sourceTree = "<group>"; };
+		D7DB6409AA3F5CE20D48A7B9 /* CSPropUnknown.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropUnknown.h; sourceTree = "<group>"; };
+		D91EC4B2021EEA20F36C13E8 /* Copper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Copper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E01151D5B09B1BE2D8FB150D /* CSTransform.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSTransform.h; sourceTree = "<group>"; };
+		E5374364FF616CAF2E4CEF11 /* CSPropExcitation.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropExcitation.cpp; sourceTree = "<group>"; };
+		E6894DAA01911257A836872F /* CSPrimPoint.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimPoint.cpp; sourceTree = "<group>"; };
+		EB54C893B6BEF4C307087D40 /* CSPrimPolyhedron.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPolyhedron.h; sourceTree = "<group>"; };
+		EF8AA971C88A1AC7BFD9B346 /* ParameterObjects.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParameterObjects.h; sourceTree = "<group>"; };
+		F459ABC0CC5CFA48159504EF /* CSPrimUserDefined.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimUserDefined.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D4EC3E253FD202A57E4579CF /* Exceptions for "CopperUtils" folder in "CopperUtils" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			publicHeaders = (
+				logging.hpp,
+			);
+			target = 4A8AA87DCFAFA02E03A63665 /* CopperUtils */;
+		};
+		F922E6F4E3ED125A39C205B0 /* Exceptions for "Copper" folder in "Copper" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			additionalCompilerFlagsByRelativePath = {
+				Internal/CopperEngine.mm = "-fobjc-arc-exceptions";
+			};
+			publicHeaders = (
+				Copper.h,
+			);
+			target = 3818463DDAC498C89C93C21E /* Copper */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		1D5ADA8DEB05471CFA59E84B /* CopperTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = CopperTests;
+			sourceTree = "<group>";
+		};
+		3E706D59F457756B1B57D0B5 /* CopperUtils */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D4EC3E253FD202A57E4579CF /* Exceptions for "CopperUtils" folder in "CopperUtils" target */,
+			);
+			path = CopperUtils;
+			sourceTree = "<group>";
+		};
+		A27B24154E025DFC3AFA3C7D /* Copper */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F922E6F4E3ED125A39C205B0 /* Exceptions for "Copper" folder in "Copper" target */,
+			);
+			path = Copper;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1F986FD528691833DE22F858 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2F7657AE2D383104F1ACBF48 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99C5BDC165596DCE680D8546 /* Cocoa.framework in Frameworks */,
+				9CB4CC37F5DD0F0E4D814CCF /* Accelerate.framework in Frameworks */,
+				B26D3E41B8AA3DC2A5FB6DA8 /* Metal.framework in Frameworks */,
+				798E98E43B14B0F1B36C5243 /* libCopperUtils.a in Frameworks */,
+				46D666BC9696E9651FCFEE31 /* libCSXCAD.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		67728548F88BC880BB927985 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5D63EC94AAAABA835D80AD23 /* Cocoa.framework in Frameworks */,
+				A2FFB4D6253A22B65F2FFE3D /* Copper.framework in Frameworks */,
+				DD97080C84BB30A0720C75BC /* libCSXCAD.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7427C70865376015BBCC9006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62805560624895BE2386B34E /* Cocoa.framework in Frameworks */,
+				0560A9A5F313EC206E39CB19 /* libCopperUtils.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		02905EDBE36A795161145C47 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				82F5FC90F60595D059FA97FA /* CSXCAD */,
+				3A7AF08CDC762BC1D35DAF8E /* fparser */,
+				CA317235D96D39D94FDDCF8B /* tinyxml */,
+			);
+			name = Dependencies;
+			path = submodules;
+			sourceTree = "<group>";
+		};
+		119D4A093C274FEEEEAA71E5 = {
+			isa = PBXGroup;
+			children = (
+				19E510373C4D9A05244DC0F8 /* Config */,
+				02905EDBE36A795161145C47 /* Dependencies */,
+				B04B62791A02A0145EA2DDCB /* Frameworks */,
+				1BB2B2034F4CC418058A920E /* Products */,
+				197BB12CE7825E607A719C24 /* docs */,
+				A27B24154E025DFC3AFA3C7D /* Copper */,
+				1D5ADA8DEB05471CFA59E84B /* CopperTests */,
+				3E706D59F457756B1B57D0B5 /* CopperUtils */,
+			);
+			sourceTree = "<group>";
+		};
+		197BB12CE7825E607A719C24 /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				7A026BC10D4E6EBFBDA8C7E6 /* copper_field_storage_experiments.md */,
+				829A139D8DACEC6B975E19F8 /* field_frame_series_format.md */,
+			);
+			name = docs;
+			path = docs;
+			sourceTree = "<group>";
+		};
+		19E510373C4D9A05244DC0F8 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				1D3C154A86426B644D3566C7 /* BuildPaths.xcconfig */,
+				B4612EC255D295111FB95110 /* DependencyCheck.h */,
+			);
+			name = Config;
+			path = Config;
+			sourceTree = "<group>";
+		};
+		1BB2B2034F4CC418058A920E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */,
+				3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */,
+				D91EC4B2021EEA20F36C13E8 /* Copper.framework */,
+				50DA849D124607C4D7B1A46C /* CopperTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3A7AF08CDC762BC1D35DAF8E /* fparser */ = {
+			isa = PBXGroup;
+			children = (
+				2FAAD97A992A4EF608EE81B2 /* fparser.cc */,
+				D7CC1595E4CB5473475095EE /* fparser.hh */,
+				5ED73BABAA0671F6FCD02983 /* fparser_gmpint.hh */,
+				C3969925EBD045A8743AD587 /* fparser_mpfr.hh */,
+				AA23E245E89A6CE7E53BA045 /* fpconfig.hh */,
+				33AB50487990E79E3018A3BE /* fpoptimizer.cc */,
+			);
+			name = fparser;
+			path = fparser;
+			sourceTree = "<group>";
+		};
+		82F5FC90F60595D059FA97FA /* CSXCAD */ = {
+			isa = PBXGroup;
+			children = (
+				B68DE0FB3FC06117F6CB6E96 /* CSBackgroundMaterial.cpp */,
+				CCC715505E3820CE055416B0 /* CSBackgroundMaterial.h */,
+				1C8AB067F9A2BFC5184D54DD /* CSFunctionParser.cpp */,
+				03185B6902536DCAA50768FD /* CSFunctionParser.h */,
+				19107B02DF5B2334DFE2F7DB /* CSModeData.cpp */,
+				0978DDBB26D87F4D3269A240 /* CSModeData.h */,
+				392A5304AAD3B0B36A195A28 /* CSObject.cpp */,
+				C02930E4233F720191946A92 /* CSObject.h */,
+				5275AED038D13ECAAD4B5BBB /* CSPrimBox.cpp */,
+				C9B1607C31917DAEA552D93C /* CSPrimBox.h */,
+				BD8AEEE6A9823DF442C7CA2B /* CSPrimCurve.cpp */,
+				98C7122D015AE3BADACBBDC2 /* CSPrimCurve.h */,
+				7AF409E4E579731AAE2D895E /* CSPrimCylinder.cpp */,
+				9E9CC1FE59139E67CF7E70B3 /* CSPrimCylinder.h */,
+				5C0AB9A94C62AE5115902EDA /* CSPrimCylindricalShell.cpp */,
+				841D0FB5789F0F1C8C57EB75 /* CSPrimCylindricalShell.h */,
+				9ED32FE3385B357DB995A992 /* CSPrimLinPoly.cpp */,
+				D2B543061B247AAEB046FC4D /* CSPrimLinPoly.h */,
+				D7DA55CD8B8F43603CBF7440 /* CSPrimMultiBox.cpp */,
+				835733E2D242DE2DBCB24030 /* CSPrimMultiBox.h */,
+				E6894DAA01911257A836872F /* CSPrimPoint.cpp */,
+				35E23CA6597761F2C26CE848 /* CSPrimPoint.h */,
+				CCE6EA719787E74EB283C77C /* CSPrimPolygon.cpp */,
+				5C896CA840676E229D619DA3 /* CSPrimPolygon.h */,
+				55D034266EC70D8C6EBE4621 /* CSPrimPolyhedron.cpp */,
+				EB54C893B6BEF4C307087D40 /* CSPrimPolyhedron.h */,
+				B7203E9A456149DB8FB9B633 /* CSPrimPolyhedronReader.cpp */,
+				ADB7AFD53555E82B112ED67E /* CSPrimPolyhedronReader.h */,
+				38B79C72EA44BFFD79CA927F /* CSPrimPolyhedron_p.h */,
+				B4F576FAAAAF9DD769E4F417 /* CSPrimRotPoly.cpp */,
+				753D0C79263BE7D365068E5B /* CSPrimRotPoly.h */,
+				582E95673AF775E7C5A4EBEE /* CSPrimSphere.cpp */,
+				2E6CC06E9F87669481746998 /* CSPrimSphere.h */,
+				53E42EE90820060F11B96EFB /* CSPrimSphericalShell.cpp */,
+				869E97FF3C1F876E3F9EB9BA /* CSPrimSphericalShell.h */,
+				10A0633C3052ADF6DB48645B /* CSPrimUserDefined.cpp */,
+				F459ABC0CC5CFA48159504EF /* CSPrimUserDefined.h */,
+				B8EE7A287292801D969EBEE8 /* CSPrimWire.cpp */,
+				1152C919AFA2239F71623B17 /* CSPrimWire.h */,
+				14403A9D7934B6D535ECEEEA /* CSPrimitives.cpp */,
+				880C07DB3F1B466A53EC22FA /* CSPrimitives.h */,
+				3E45A17E6C81E9F1E8851729 /* CSPropAbsorbingBC.cpp */,
+				5136D2932F001C3BD6439D33 /* CSPropAbsorbingBC.h */,
+				4C632AFE5B95D415966502B2 /* CSPropConductingSheet.cpp */,
+				3EFA9B9172395C8119BF1347 /* CSPropConductingSheet.h */,
+				7019BD9D40D2F7B488141B47 /* CSPropDebyeMaterial.cpp */,
+				03B6926C29EEC0D3C1AFA5F9 /* CSPropDebyeMaterial.h */,
+				62E84E2F8D9CDD378F82B722 /* CSPropDiscMaterial.cpp */,
+				584C879469B3A4EBDAA60A67 /* CSPropDiscMaterial.h */,
+				99BBF1C2A91DE6F8F90AD7C9 /* CSPropDispersiveMaterial.cpp */,
+				79E9BE38335DB9DB3CAFD9AC /* CSPropDispersiveMaterial.h */,
+				49380B939918173C5E163869 /* CSPropDumpBox.cpp */,
+				B93DBDD97C7AA58C5E249794 /* CSPropDumpBox.h */,
+				E5374364FF616CAF2E4CEF11 /* CSPropExcitation.cpp */,
+				CC195ABA9749F0A1F741A458 /* CSPropExcitation.h */,
+				42BD6262E25FB3CA48DC0521 /* CSPropLorentzMaterial.cpp */,
+				B4FA74C7B7B284D5CBBB01C5 /* CSPropLorentzMaterial.h */,
+				31DDD0FCF16EEA1323AE2971 /* CSPropLumpedElement.cpp */,
+				68CA3F597AA62E0B5732A2D3 /* CSPropLumpedElement.h */,
+				35E032FD12157DD7436C060B /* CSPropMaterial.cpp */,
+				B5324AD08DD439C74D8E4162 /* CSPropMaterial.h */,
+				659582DF355BC23285681D28 /* CSPropMetal.cpp */,
+				4A10D5DBF92E4608A44E3859 /* CSPropMetal.h */,
+				2941FAC6E5079B742EA0677D /* CSPropProbeBox.cpp */,
+				7E00681EF23C96E69CD24446 /* CSPropProbeBox.h */,
+				3FAC355CC2A5EC58DE3DB901 /* CSPropResBox.cpp */,
+				BC6D3573C7FB15044236A080 /* CSPropResBox.h */,
+				621B998B5A6FAD0B88C1FA5C /* CSPropUnknown.cpp */,
+				D7DB6409AA3F5CE20D48A7B9 /* CSPropUnknown.h */,
+				49663DFBA7D26ACD3593530A /* CSProperties.cpp */,
+				9A509E087A2B76CF08E3BEEA /* CSProperties.h */,
+				D09307B1321F43E7A6B24545 /* CSRectGrid.cpp */,
+				0B99F0A4120DF79FB7436D9C /* CSRectGrid.h */,
+				373F49427E55B9CD2B6D0100 /* CSSpatialIndex.cpp */,
+				90FCD26FCB648BDA291AC8B1 /* CSSpatialIndex.h */,
+				09DDE61CE07C7206D4338495 /* CSTransform.cpp */,
+				E01151D5B09B1BE2D8FB150D /* CSTransform.h */,
+				2E85D2C7AFD6BC42B1023E25 /* CSUseful.cpp */,
+				26A87F78304BB1DF829ECF5B /* CSUseful.h */,
+				AA17D884E3FFD300A56BD57B /* CSXCADLogging.h */,
+				905F8F778476EC74B388004E /* CSXCAD_Global.h */,
+				2451E7CD12BD31F3818F94CE /* ContinuousStructure.cpp */,
+				506C9F0B0A5C036B89497B1B /* ContinuousStructure.h */,
+				24B7335A2F71AEA6CA923AA9 /* ParameterCoord.cpp */,
+				7BCB52FBE0FB964B0641E104 /* ParameterCoord.h */,
+				5DC26131EC2F82F313F707C9 /* ParameterObjects.cpp */,
+				EF8AA971C88A1AC7BFD9B346 /* ParameterObjects.h */,
+			);
+			name = CSXCAD;
+			path = CSXCAD/src;
+			sourceTree = "<group>";
+		};
+		9AA41A806B1D80AF51496C1A /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */,
+				A0E6900AA5EA8F88D90AEA6C /* Accelerate.framework */,
+				88E41EBB8BD36FF23AA0C199 /* Metal.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		B04B62791A02A0145EA2DDCB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9AA41A806B1D80AF51496C1A /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CA317235D96D39D94FDDCF8B /* tinyxml */ = {
+			isa = PBXGroup;
+			children = (
+				645482BE133775AD0FEBA242 /* tinystr.cpp */,
+				080BBEFB571677E8C30ABF9F /* tinystr.h */,
+				7F92AECB98E3B94079636305 /* tinyxml.cpp */,
+				B5458AECDDD4770A6F36564B /* tinyxml.h */,
+				6EA5DB87FF6E02B73427F10F /* tinyxmlerror.cpp */,
+				8B4CBA74CF3B707715FE6898 /* tinyxmlparser.cpp */,
+			);
+			name = tinyxml;
+			path = tinyxml;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		314FBA1551C44E96938BC1FC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3A67E384C28782DBA66077B3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C366C5E0FE5084F5B264448C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		0F0374D92E735F41CCC00550 /* CopperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D2ABDE8071C6E947768BF76 /* Build configuration list for PBXNativeTarget "CopperTests" */;
+			buildPhases = (
+				C08AFBDF0BE39F82DF83ADB5 /* Sources */,
+				67728548F88BC880BB927985 /* Frameworks */,
+				F0C9107AE45A0129AF2E1418 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E448E170D1900729C0D46B48 /* PBXTargetDependency */,
+				9B39A015CBFC6525994CD165 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				1D5ADA8DEB05471CFA59E84B /* CopperTests */,
+			);
+			name = CopperTests;
+			productName = CopperTests;
+			productReference = 50DA849D124607C4D7B1A46C /* CopperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		3818463DDAC498C89C93C21E /* Copper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B465758AC6A6C14E881C7E6 /* Build configuration list for PBXNativeTarget "Copper" */;
+			buildPhases = (
+				3A67E384C28782DBA66077B3 /* Headers */,
+				C8651569F259C92FA5110967 /* Sources */,
+				2F7657AE2D383104F1ACBF48 /* Frameworks */,
+				B12834D3E9FEDF3FFBD0F0B0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5536BBE3A53FDD9EDA86154E /* PBXTargetDependency */,
+				010D1F32FD7BEC49B75DF5A6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A27B24154E025DFC3AFA3C7D /* Copper */,
+			);
+			name = Copper;
+			productName = Copper;
+			productReference = D91EC4B2021EEA20F36C13E8 /* Copper.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		436BD46808618ED0B9E3983D /* CSXCAD */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 42EB51A262826E093D63E46E /* Build configuration list for PBXNativeTarget "CSXCAD" */;
+			buildPhases = (
+				314FBA1551C44E96938BC1FC /* Headers */,
+				70BE0A4C8B96A5165DA31264 /* Sources */,
+				7427C70865376015BBCC9006 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E4CEF3E02FF62C6CC025F7EB /* PBXTargetDependency */,
+			);
+			name = CSXCAD;
+			productName = CSXCAD;
+			productReference = 3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		4A8AA87DCFAFA02E03A63665 /* CopperUtils */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7ABFE65EB2957701056E00B /* Build configuration list for PBXNativeTarget "CopperUtils" */;
+			buildPhases = (
+				C366C5E0FE5084F5B264448C /* Headers */,
+				3019336469D2F347CFF031F5 /* Sources */,
+				1F986FD528691833DE22F858 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3E706D59F457756B1B57D0B5 /* CopperUtils */,
+			);
+			name = CopperUtils;
+			productName = CopperUtils;
+			productReference = A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		547F02E1E022D27E93E11471 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2660;
+				ORGANIZATIONNAME = "Tom Davie";
+				TargetAttributes = {
+					0F0374D92E735F41CCC00550 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					3818463DDAC498C89C93C21E = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					436BD46808618ED0B9E3983D = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					4A8AA87DCFAFA02E03A63665 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 91311C9A7E7B98B172AD970B /* Build configuration list for PBXProject "Copper" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 119D4A093C274FEEEEAA71E5;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 100;
+			productRefGroup = 1BB2B2034F4CC418058A920E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4A8AA87DCFAFA02E03A63665 /* CopperUtils */,
+				436BD46808618ED0B9E3983D /* CSXCAD */,
+				3818463DDAC498C89C93C21E /* Copper */,
+				0F0374D92E735F41CCC00550 /* CopperTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B12834D3E9FEDF3FFBD0F0B0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F0C9107AE45A0129AF2E1418 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3019336469D2F347CFF031F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		70BE0A4C8B96A5165DA31264 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E5299B11E9C8848E00AD5152 /* CSBackgroundMaterial.cpp in Sources */,
+				54A8C107A2BE3850E7AD014B /* CSFunctionParser.cpp in Sources */,
+				15B71A1A31538C5A4D47DDD6 /* CSModeData.cpp in Sources */,
+				7E592664D42967B0D22589FE /* CSObject.cpp in Sources */,
+				827DA68E750A7B408EA42267 /* CSPrimBox.cpp in Sources */,
+				D4349EA9904C838480776FCA /* CSPrimCurve.cpp in Sources */,
+				6C75C637755647DDC99161F9 /* CSPrimCylinder.cpp in Sources */,
+				D936249311D82577FC9686CB /* CSPrimCylindricalShell.cpp in Sources */,
+				D0EE99D8F60401BE348D23A7 /* CSPrimLinPoly.cpp in Sources */,
+				628E926FB70334167AA6A82C /* CSPrimMultiBox.cpp in Sources */,
+				ACED1480CBA2AE28153FEA9E /* CSPrimPoint.cpp in Sources */,
+				04B2B86F983C8C5A023DC90A /* CSPrimPolygon.cpp in Sources */,
+				1CD4FD1DD6F27522E8A763DC /* CSPrimPolyhedron.cpp in Sources */,
+				B6DE86419517456A7967274A /* CSPrimPolyhedronReader.cpp in Sources */,
+				8A7C4526A1B0E8DD3B16DC03 /* CSPrimRotPoly.cpp in Sources */,
+				548FA834261D5A56090B9EA2 /* CSPrimSphere.cpp in Sources */,
+				4F0654CC2396B2A98E427EB2 /* CSPrimSphericalShell.cpp in Sources */,
+				A76F16654E811644DA4D8F4E /* CSPrimUserDefined.cpp in Sources */,
+				600611418B043A403CFAA81D /* CSPrimWire.cpp in Sources */,
+				A72DA55D4BB947D401CF90CC /* CSPrimitives.cpp in Sources */,
+				CCC56DD58C04AC99C0E9E174 /* CSPropAbsorbingBC.cpp in Sources */,
+				1F0B10E31305467EFE5AF213 /* CSPropConductingSheet.cpp in Sources */,
+				66E58DD2CEF76934C15168FA /* CSPropDebyeMaterial.cpp in Sources */,
+				6289F839B13DD503D9DD5F82 /* CSPropDiscMaterial.cpp in Sources */,
+				5D058B8AEACE7C4CC74982FD /* CSPropDispersiveMaterial.cpp in Sources */,
+				338991977E432253F5624470 /* CSPropDumpBox.cpp in Sources */,
+				A032922B535CB11035EFD37A /* CSPropExcitation.cpp in Sources */,
+				1BDBB50043583C924CC60B69 /* CSPropLorentzMaterial.cpp in Sources */,
+				6508E1AC850EE3C9D7CBA455 /* CSPropLumpedElement.cpp in Sources */,
+				4CB26506BBA7E1DF51710EA0 /* CSPropMaterial.cpp in Sources */,
+				949750C162BE7358F4658DCD /* CSPropMetal.cpp in Sources */,
+				509ABB995FDD2894AD97FA11 /* CSPropProbeBox.cpp in Sources */,
+				BB13EEF6C3174AFAD62548EA /* CSPropResBox.cpp in Sources */,
+				5B13B6D149D66B0CDC7F1E5F /* CSPropUnknown.cpp in Sources */,
+				4E5B0B1E62A9ACE0E3A67968 /* CSProperties.cpp in Sources */,
+				5B2B2E719D953507E90FA2CB /* CSRectGrid.cpp in Sources */,
+				EABA01871574BD330EFC2B5D /* CSSpatialIndex.cpp in Sources */,
+				E4184CC82B9F9EA2C02933F3 /* CSTransform.cpp in Sources */,
+				F7E70C035A56A1EE3D83A307 /* CSUseful.cpp in Sources */,
+				3D1271193BE7F28210A32DC5 /* ContinuousStructure.cpp in Sources */,
+				2B28A64197EC34386A462A87 /* ParameterCoord.cpp in Sources */,
+				5DB92BABCB73E13DED4FEF42 /* ParameterObjects.cpp in Sources */,
+				0B4414645139F4079F0425F2 /* fparser.cc in Sources */,
+				C50529848E056E3A52942D24 /* fpoptimizer.cc in Sources */,
+				1BDB3D5F5771515E9FC5EF7E /* tinystr.cpp in Sources */,
+				74E2D8EF6E322BE704C47559 /* tinyxml.cpp in Sources */,
+				C9DD33EA8887024C8CEB9BC4 /* tinyxmlerror.cpp in Sources */,
+				9BEF0DEE4F00C103AC5E4D16 /* tinyxmlparser.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C08AFBDF0BE39F82DF83ADB5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C8651569F259C92FA5110967 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		010D1F32FD7BEC49B75DF5A6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CopperUtils;
+			target = 4A8AA87DCFAFA02E03A63665 /* CopperUtils */;
+			targetProxy = EDEA6E8B59FAE0D9C7373815 /* PBXContainerItemProxy */;
+		};
+		5536BBE3A53FDD9EDA86154E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CSXCAD;
+			target = 436BD46808618ED0B9E3983D /* CSXCAD */;
+			targetProxy = 07188A4F62E6B3A39248E172 /* PBXContainerItemProxy */;
+		};
+		9B39A015CBFC6525994CD165 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CSXCAD;
+			target = 436BD46808618ED0B9E3983D /* CSXCAD */;
+			targetProxy = C15B021A7B7AA6F3DA9F0737 /* PBXContainerItemProxy */;
+		};
+		E448E170D1900729C0D46B48 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Copper;
+			target = 3818463DDAC498C89C93C21E /* Copper */;
+			targetProxy = 486E71F7767DADF5656D923F /* PBXContainerItemProxy */;
+		};
+		E4CEF3E02FF62C6CC025F7EB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CopperUtils;
+			target = 4A8AA87DCFAFA02E03A63665 /* CopperUtils */;
+			targetProxy = 3C478C143279D7327D2BF381 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		095A037DED9EF5FDA1E0BAEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 c++23";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lgeos_c",
+					"-lhdf5",
+					"-lblosc2",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomdavie.Copper;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/submodules/CSXCAD/src",
+				);
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		09AF4F75618CF66049E6A181 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Copper";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lhdf5",
+					"-lblosc2",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomdavie.CopperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/submodules/CSXCAD/src",
+				);
+			};
+			name = Release;
+		};
+		22DB1AD6625AA694DE99378B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_WARN_EVERYTHING = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"GIT_VERSION=\\\"vendored\\\"",
+					BUILD_CSXCAD_LIB,
+					TIXML_USE_STL,
+					H5_USE_16_API,
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/submodules/tinyxml",
+					"$(SRCROOT)/submodules/fparser",
+					"$(HOMEBREW_PREFIX)/include",
+					"$(HOMEBREW_PREFIX)/include/vtk-$(VTK_VERSION)",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(HOMEBREW_PREFIX)/opt/hdf5/lib",
+					"$(HOMEBREW_PREFIX)/opt/gmp/lib",
+					"$(HOMEBREW_PREFIX)/opt/mpfr/lib",
+					"$(HOMEBREW_PREFIX)/opt/vtk/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-frounding-math",
+				);
+				OTHER_LDFLAGS = (
+					"-lhdf5",
+					"-lhdf5_hl",
+					"-lgmp",
+					"-lgmpxx",
+					"-lmpfr",
+					"-lvtkIOGeometry-$(VTK_VERSION)",
+					"-lvtkIOPLY-$(VTK_VERSION)",
+					"-lvtkIOLegacy-$(VTK_VERSION)",
+					"-lvtkIOCellGrid-$(VTK_VERSION)",
+					"-lvtkFiltersCellGrid-$(VTK_VERSION)",
+					"-lvtkIOCore-$(VTK_VERSION)",
+					"-lvtkCommonExecutionModel-$(VTK_VERSION)",
+					"-lvtkCommonDataModel-$(VTK_VERSION)",
+					"-lvtkCommonTransforms-$(VTK_VERSION)",
+					"-lvtkCommonMath-$(VTK_VERSION)",
+					"-lvtkCommonCore-$(VTK_VERSION)",
+					"-lvtkfmt-$(VTK_VERSION)",
+					"-lvtkscn-$(VTK_VERSION)",
+					"-lvtktoken-$(VTK_VERSION)",
+					"-lvtksys-$(VTK_VERSION)",
+					"-lvtkkissfft-$(VTK_VERSION)",
+				);
+				PRODUCT_NAME = CSXCAD;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				WARNING_CFLAGS = "-w";
+			};
+			name = Debug;
+		};
+		4C88880AD5BE58B4F0A154E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		51343EFA6971A430474C3A27 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8505BC9B8A4544B771E9CCC6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1D3C154A86426B644D3566C7 /* BuildPaths.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_FLOAT_CONVERSION = YES_ERROR;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES_ERROR;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SEMICOLON_BEFORE_METHOD_BODY = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = c23;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(HOMEBREW_PREFIX)/lib",
+					"$(BUILT_PRODUCTS_DIR)",
+					"@loader_path",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(HOMEBREW_PREFIX)/lib",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
+				SDKROOT = macosx;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(HOMEBREW_PREFIX)/include",
+					"$(SRCROOT)/submodules/CSXCAD/src",
+				);
+				WARNING_CFLAGS = (
+					"$(inherited)",
+					"-Wno-documentation-deprecated-sync",
+				);
+			};
+			name = Debug;
+		};
+		9D628979E196CBBD37ABD36D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_WARN_EVERYTHING = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"GIT_VERSION=\\\"vendored\\\"",
+					BUILD_CSXCAD_LIB,
+					TIXML_USE_STL,
+					H5_USE_16_API,
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/submodules/tinyxml",
+					"$(SRCROOT)/submodules/fparser",
+					"$(HOMEBREW_PREFIX)/include",
+					"$(HOMEBREW_PREFIX)/include/vtk-$(VTK_VERSION)",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(HOMEBREW_PREFIX)/opt/hdf5/lib",
+					"$(HOMEBREW_PREFIX)/opt/gmp/lib",
+					"$(HOMEBREW_PREFIX)/opt/mpfr/lib",
+					"$(HOMEBREW_PREFIX)/opt/vtk/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-frounding-math",
+				);
+				OTHER_LDFLAGS = (
+					"-lhdf5",
+					"-lhdf5_hl",
+					"-lgmp",
+					"-lgmpxx",
+					"-lmpfr",
+					"-lvtkIOGeometry-$(VTK_VERSION)",
+					"-lvtkIOPLY-$(VTK_VERSION)",
+					"-lvtkIOLegacy-$(VTK_VERSION)",
+					"-lvtkIOCellGrid-$(VTK_VERSION)",
+					"-lvtkFiltersCellGrid-$(VTK_VERSION)",
+					"-lvtkIOCore-$(VTK_VERSION)",
+					"-lvtkCommonExecutionModel-$(VTK_VERSION)",
+					"-lvtkCommonDataModel-$(VTK_VERSION)",
+					"-lvtkCommonTransforms-$(VTK_VERSION)",
+					"-lvtkCommonMath-$(VTK_VERSION)",
+					"-lvtkCommonCore-$(VTK_VERSION)",
+					"-lvtkfmt-$(VTK_VERSION)",
+					"-lvtkscn-$(VTK_VERSION)",
+					"-lvtktoken-$(VTK_VERSION)",
+					"-lvtksys-$(VTK_VERSION)",
+					"-lvtkkissfft-$(VTK_VERSION)",
+				);
+				PRODUCT_NAME = CSXCAD;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				WARNING_CFLAGS = "-w";
+			};
+			name = Release;
+		};
+		BC43D94F7C6825AD7C1EF481 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1D3C154A86426B644D3566C7 /* BuildPaths.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_FLOAT_CONVERSION = YES_ERROR;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES_ERROR;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SEMICOLON_BEFORE_METHOD_BODY = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = c23;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"NDEBUG=1",
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(HOMEBREW_PREFIX)/lib",
+					"$(BUILT_PRODUCTS_DIR)",
+					"@loader_path",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(HOMEBREW_PREFIX)/lib",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "";
+				SDKROOT = macosx;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(HOMEBREW_PREFIX)/include",
+					"$(SRCROOT)/submodules/CSXCAD/src",
+				);
+				WARNING_CFLAGS = (
+					"$(inherited)",
+					"-Wno-documentation-deprecated-sync",
+				);
+			};
+			name = Release;
+		};
+		E3587F4E76CD8B4C1FA50DE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Copper";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lhdf5",
+					"-lblosc2",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomdavie.CopperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/submodules/CSXCAD/src",
+				);
+			};
+			name = Debug;
+		};
+		E382C37B5FE17F1A15824236 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 c++23";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lgeos_c",
+					"-lhdf5",
+					"-lblosc2",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomdavie.Copper;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/submodules/CSXCAD/src",
+				);
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		42EB51A262826E093D63E46E /* Build configuration list for PBXNativeTarget "CSXCAD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9D628979E196CBBD37ABD36D /* Release */,
+				22DB1AD6625AA694DE99378B /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5B465758AC6A6C14E881C7E6 /* Build configuration list for PBXNativeTarget "Copper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E382C37B5FE17F1A15824236 /* Release */,
+				095A037DED9EF5FDA1E0BAEA /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D2ABDE8071C6E947768BF76 /* Build configuration list for PBXNativeTarget "CopperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				09AF4F75618CF66049E6A181 /* Release */,
+				E3587F4E76CD8B4C1FA50DE2 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		91311C9A7E7B98B172AD970B /* Build configuration list for PBXProject "Copper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8505BC9B8A4544B771E9CCC6 /* Debug */,
+				BC43D94F7C6825AD7C1EF481 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E7ABFE65EB2957701056E00B /* Build configuration list for PBXNativeTarget "CopperUtils" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				51343EFA6971A430474C3A27 /* Release */,
+				4C88880AD5BE58B4F0A154E5 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 547F02E1E022D27E93E11471 /* Project object */;
+}
