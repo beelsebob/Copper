@@ -4,10 +4,22 @@
 
 namespace copper {
 
+namespace {
+std::unique_ptr<EngineBackend> makeBackend(const CopperYeeGrid& grid, const CopperExcitation& excitation,
+                                           const CopperCPML& cpml, CopperEngine::Backend backend,
+                                           const CopperDomainMask& domainMask) {
+#if defined(__APPLE__) && !defined(COPPER_CPU_ONLY)
+    if (backend == CopperEngine::Backend::Metal) return makeMetalEngineBackend(grid, excitation, cpml, domainMask);
+#else
+    (void)backend;
+#endif
+    return makeCPUEngineBackend(grid, excitation, cpml, domainMask);
+}
+} // namespace
+
 CopperEngine::CopperEngine(const CopperYeeGrid& grid, const CopperExcitation& excitation, const CopperCPML& cpml,
                             Backend backend, const CopperDomainMask& domainMask)
-    : _backend(backend == Backend::Metal ? makeMetalEngineBackend(grid, excitation, cpml, domainMask)
-                                          : makeCPUEngineBackend(grid, excitation, cpml, domainMask)) {}
+    : _backend(makeBackend(grid, excitation, cpml, backend, domainMask)) {}
 
 CopperEngine::~CopperEngine() = default;
 

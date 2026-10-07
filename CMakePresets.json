@@ -1,0 +1,16 @@
+{
+  "version": 6,
+  "configurePresets": [
+    { "name": "base", "hidden": true, "generator": "Ninja", "binaryDir": "${sourceDir}/build/cmake/${presetName}", "cacheVariables": { "CMAKE_EXPORT_COMPILE_COMMANDS": "ON" } },
+    { "name": "macos-debug", "inherits": "base", "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "CMAKE_OSX_ARCHITECTURES": "arm64" } },
+    { "name": "macos-release", "inherits": "base", "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "CMAKE_OSX_ARCHITECTURES": "arm64" } },
+    { "name": "linux-debug", "inherits": "base", "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "COPPER_ENABLE_METAL": "OFF" } },
+    { "name": "linux-release", "inherits": "base", "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "COPPER_ENABLE_METAL": "OFF" } }
+  ],
+  "buildPresets": [
+    { "name": "macos-debug", "configurePreset": "macos-debug" },
+    { "name": "macos-release", "configurePreset": "macos-release" },
+    { "name": "linux-debug", "configurePreset": "linux-debug" },
+    { "name": "linux-release", "configurePreset": "linux-release" }
+  ]
+}

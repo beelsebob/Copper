@@ -529,7 +529,7 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
-/* Begin PBXNativeTarget section */
+/* Begin PBXLegacyTarget section */
 		0F0374D92E735F41CCC00550 /* CopperTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8D2ABDE8071C6E947768BF76 /* Build configuration list for PBXNativeTarget "CopperTests" */;
@@ -553,46 +553,34 @@
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		3818463DDAC498C89C93C21E /* Copper */ = {
-			isa = PBXNativeTarget;
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SRCROOT)/Scripts/build_with_cmake.sh\" Copper \"$(CONFIGURATION)\" \"$(BUILT_PRODUCTS_DIR)\"";
 			buildConfigurationList = 5B465758AC6A6C14E881C7E6 /* Build configuration list for PBXNativeTarget "Copper" */;
-			buildPhases = (
-				3A67E384C28782DBA66077B3 /* Headers */,
-				C8651569F259C92FA5110967 /* Sources */,
-				2F7657AE2D383104F1ACBF48 /* Frameworks */,
-				B12834D3E9FEDF3FFBD0F0B0 /* Resources */,
-			);
-			buildRules = (
-			);
+			buildToolPath = /bin/sh;
+			buildWorkingDirectory = "$(SRCROOT)";
 			dependencies = (
 				5536BBE3A53FDD9EDA86154E /* PBXTargetDependency */,
-				010D1F32FD7BEC49B75DF5A6 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A27B24154E025DFC3AFA3C7D /* Copper */,
 			);
 			name = Copper;
+			passBuildSettingsInEnvironment = 1;
 			productName = Copper;
-			productReference = D91EC4B2021EEA20F36C13E8 /* Copper.framework */;
-			productType = "com.apple.product-type.framework";
 		};
 		436BD46808618ED0B9E3983D /* CSXCAD */ = {
-			isa = PBXNativeTarget;
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SRCROOT)/Scripts/build_with_cmake.sh\" CSXCAD \"$(CONFIGURATION)\" \"$(BUILT_PRODUCTS_DIR)\"";
 			buildConfigurationList = 42EB51A262826E093D63E46E /* Build configuration list for PBXNativeTarget "CSXCAD" */;
-			buildPhases = (
-				314FBA1551C44E96938BC1FC /* Headers */,
-				70BE0A4C8B96A5165DA31264 /* Sources */,
-				7427C70865376015BBCC9006 /* Frameworks */,
-			);
-			buildRules = (
-			);
+			buildToolPath = /bin/sh;
+			buildWorkingDirectory = "$(SRCROOT)";
 			dependencies = (
 				E4CEF3E02FF62C6CC025F7EB /* PBXTargetDependency */,
 			);
 			name = CSXCAD;
+			passBuildSettingsInEnvironment = 1;
 			productName = CSXCAD;
-			productReference = 3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */;
-			productType = "com.apple.product-type.library.dynamic";
 		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXNativeTarget section */
 		4A8AA87DCFAFA02E03A63665 /* CopperUtils */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E7ABFE65EB2957701056E00B /* Build configuration list for PBXNativeTarget "CopperUtils" */;

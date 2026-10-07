@@ -9,7 +9,6 @@
 #include <limits>
 #include <numeric>
 #include <hdf5.h>
-#include <os/signpost.h>
 
 #include "Internal/CopperFieldFrameSignposts.hpp"
 #include "Internal/CopperHDF5Blosc2.hpp"

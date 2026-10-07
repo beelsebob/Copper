@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3818463DDAC498C89C93C21E"
-               BuildableName = "Copper.framework"
+               BuildableName = "Copper"
                BlueprintName = "Copper"
                ReferencedContainer = "container:Copper.xcodeproj">
             </BuildableReference>

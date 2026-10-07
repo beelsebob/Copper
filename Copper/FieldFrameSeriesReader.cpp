@@ -821,6 +821,8 @@ FieldFrameSeriesReader::readPreviewCellDetails(
                 }
                 auto& payload = raw[tileIndex].payloads[component];
                 payload.resize(static_cast<std::size_t>(storedBytes));
+#if H5Dread_chunk_vers >= 2
+                // HDF5 2.x takes the caller's buffer size and returns the number of bytes read.
                 std::size_t readBytes = payload.size();
                 if (H5Dread_chunk(impl.component[component].get(), H5P_DEFAULT, offset,
                                   &raw[tileIndex].filterMasks[component], payload.data(), &readBytes) < 0) {
@@ -828,6 +830,15 @@ FieldFrameSeriesReader::readPreviewCellDetails(
                                            kComponentNames[component]);
                 }
                 payload.resize(readBytes);
+#else
+                // HDF5 1.x has no buffer-size parameter.  The allocation above is sized using
+                // H5Dget_chunk_storage_size(), which is the documented compatibility path.
+                if (H5Dread_chunk(impl.component[component].get(), H5P_DEFAULT, offset,
+                                  &raw[tileIndex].filterMasks[component], payload.data()) < 0) {
+                    return std::unexpected(std::string("Could not read raw field-detail chunk from ") +
+                                           kComponentNames[component]);
+                }
+#endif
             }
         }
     }

@@ -21,7 +21,9 @@
 #include <utility>
 #include <vector>
 
+#if defined(__APPLE__)
 #include <mach/mach.h>
+#endif
 
 #include "FieldFrameSeriesWriter.hpp"
 #include "Internal/CopperCPML.hpp"
@@ -81,6 +83,7 @@ CopperOperator::Config copperOperatorConfig(const CopperFDTDPortConfig& portConf
 // of any observed growth is Metal-resident vs. everything else (plain heap, HDF5/Blosc2 buffers,
 // mapped files, ...) -- without needing a full Instruments trace to tell the two apart.
 std::size_t currentPhysFootprintBytes() {
+#if defined(__APPLE__)
     task_vm_info_data_t info;
     mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
     const kern_return_t result =
@@ -89,6 +92,9 @@ std::size_t currentPhysFootprintBytes() {
         return 0;
     }
     return static_cast<std::size_t>(info.phys_footprint);
+#else
+    return 0;
+#endif
 }
 
 class PhaseTimer {
