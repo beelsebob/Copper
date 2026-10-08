@@ -79,8 +79,11 @@ if(APPLE AND COPPER_ENABLE_METAL)
     find_library(METAL_FRAMEWORK Metal REQUIRED)
     target_link_libraries(Copper PRIVATE ${FOUNDATION_FRAMEWORK} ${METAL_FRAMEWORK})
     set_target_properties(Copper PROPERTIES FRAMEWORK TRUE FRAMEWORK_VERSION A)
+    # The Objective-C++ engine is written for ARC, as the Xcode project builds it.
+    target_compile_options(Copper PRIVATE $<$<COMPILE_LANGUAGE:OBJCXX>:-fobjc-arc>)
     set(COPPER_METAL_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/metal")
-    set(COPPER_METALLIB "${COPPER_METAL_DIRECTORY}/CopperFDTD.metallib")
+    # newDefaultLibraryWithBundle: only looks for default.metallib in the framework's Resources.
+    set(COPPER_METALLIB "${COPPER_METAL_DIRECTORY}/default.metallib")
     add_custom_command(OUTPUT "${COPPER_METALLIB}"
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${COPPER_METAL_DIRECTORY}"
         COMMAND xcrun -sdk macosx metal -c "${CMAKE_CURRENT_SOURCE_DIR}/Copper/Shaders/CopperFDTD.metal"
