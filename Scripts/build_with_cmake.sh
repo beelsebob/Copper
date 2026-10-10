@@ -15,9 +15,12 @@ script_directory=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 source_directory=$(CDPATH= cd -- "$script_directory/.." && pwd)
 build_directory="$source_directory/build/cmake/xcode-$configuration"
 
+# Static archives stay in the CMake tree: they are only linked into CSXCAD and Copper, and CMake's
+# C++-only libCopperUtils.a would otherwise overwrite the Xcode CopperUtils target's archive (which
+# also holds logging.swift), leaving the app's Cu.log* calls unresolved under -undefined dynamic_lookup.
 cmake -S "$source_directory" -B "$build_directory" -G Ninja \
     -DCMAKE_BUILD_TYPE="$build_type" \
-    -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY="$output_directory" \
+    -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY="$build_directory/archives" \
     -DCMAKE_LIBRARY_OUTPUT_DIRECTORY="$output_directory" \
     -DCMAKE_OSX_ARCHITECTURES="${ARCHS:-arm64}" \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-}"
