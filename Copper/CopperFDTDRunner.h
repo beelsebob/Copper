@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -316,5 +317,29 @@ std::string dumpEarlyFrames(ContinuousStructure& csx, const CopperFDTDPortConfig
 std::string dumpDetailedTrace(ContinuousStructure& csx, const CopperFDTDPortConfig& portConfig,
                                std::uint32_t stepCount = 4, std::uint32_t boxSide = 4,
                                double cpmlAlphaMax = -1.0, std::uint32_t pmlDepthCells = 8);
+
+/// The solver's own connected metal: builds the same operator a run would, labels every set of
+/// mesh nodes joined by PEC edges as one region, then keeps only those labels and the mesh lines
+/// (the operator itself is released). Used to check that copper the board keeps apart stays apart
+/// once rasterized -- a gap narrower than the local cells can merge two nets' metal. Coordinates are
+/// native CSX drawing units, like every primitive's.
+class CopperMetalMap {
+public:
+    CopperMetalMap(ContinuousStructure& csx, const CopperFDTDPortConfig& portConfig);
+    ~CopperMetalMap();
+    CopperMetalMap(CopperMetalMap&&) noexcept;
+    CopperMetalMap& operator=(CopperMetalMap&&) noexcept;
+
+    /// The metal region at the mesh node nearest `point`, or at a node within one line of it when
+    /// that node itself carries no metal; nullopt if there's none.
+    std::optional<std::uint32_t> regionAt(const std::array<double, 3>& point) const;
+    /// Every metal region with a node in the box `start`..`stop`, snapped to the nearest lines (the
+    /// same nearest-line rule lumped elements and voltage probes are snapped with).
+    std::vector<std::uint32_t> regionsIn(const std::array<double, 3>& start, const std::array<double, 3>& stop) const;
+
+private:
+    struct Impl;
+    std::unique_ptr<Impl> _impl;
+};
 
 } // namespace copper

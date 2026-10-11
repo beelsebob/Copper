@@ -62,43 +62,69 @@ std::vector<CopperLumpedRLCCell> _discoverForProperty(CSPropLumpedElement& prop,
             continue; // zero length along the current-carrying axis -- invalid, skip
         }
 
-        const unsigned int nCells0 = uiStop[dir] - uiStart[dir];
-        const unsigned int nCells1 = uiStop[dirP1] - uiStart[dirP1] + 1;
-        const unsigned int nCells2 = uiStop[dirP2] - uiStart[dirP2] + 1;
-        const unsigned int nPar = nCells1 * nCells2;
-
-        const double dL = L * static_cast<double>(nPar) / static_cast<double>(nCells0);
-        const double dR = R * static_cast<double>(nPar) / static_cast<double>(nCells0);
-        const double dC = hasC ? C * static_cast<double>(nCells0) / static_cast<double>(nPar) : 0.0;
-
-        double ib0 = 0.0;
-        double b1 = 0.0;
-        double b2 = 0.0;
-        if (dC == 0.0) {
-            ib0 = dT / (2.0 * dL + dT * dR);
-            b1 = -4.0 * dL / dT;
-            b2 = (2.0 * dL - dT * dR) / dT;
-        } else {
-            ib0 = 2.0 * dT * dC / (4.0 * dL * dC + 2.0 * dT * dR * dC + dT * dT);
-            b1 = (dT * dT - 4.0 * dL * dC) / (dT * dC);
-            b2 = (4.0 * dL * dC - 2.0 * dT * dR * dC + dT * dT) / (2.0 * dT * dC);
-        }
-        // A SERIES element with no R, L, or C at all (dC==0 branch, dL==0, dR==0) makes ib0 =
-        // dT/0 = inf -- mathematically undefined for this ADE formulation, not just numerically
-        // unlucky (openEMS's own real Operator_Ext_LumpedRLC has the identical division and no
-        // guard against it either: IsLElumpedRLC() accepts every SERIES-type element regardless of
-        // its R/L/C values). A "lumped element" with no impedance at all isn't a real RLC in the
-        // FDTD sense -- whatever conductive geometry it represents is already captured as ordinary
-        // copper/PEC elsewhere -- so skip it here rather than injecting a NaN/Inf coefficient that
-        // corrupts the field on the very first applyLumpedRLC() call of the run.
-        if (!std::isfinite(ib0) || !std::isfinite(b1) || !std::isfinite(b2)) {
-            continue;
-        }
-
+        // Only edges that aren't already metal carry the element. A box drawn pad centre to pad
+        // centre lies largely on its pads' copper, whose PEC edges are skipped below; dividing the
+        // value over every edge of the box regardless left a 62-ohm resistor across a gap a
+        // quarter of its length at about 15 ohms. So count, per transverse column, the edges that
+        // remain: each column carries the element's full value in series along those edges, and
+        // the columns that have any share it in parallel.
+        const auto isActive = [&](const unsigned int at[3]) {
+            return grid.vi[dir][copperGridIndex(grid.dims, at[0], at[1], at[2])] != 0.0F;
+        };
+        unsigned int nParActive = 0;
         unsigned int pos[3] = {0, 0, 0};
-        for (pos[dir] = uiStart[dir]; pos[dir] < uiStop[dir]; ++pos[dir]) {
-            for (pos[dirP1] = uiStart[dirP1]; pos[dirP1] <= uiStop[dirP1]; ++pos[dirP1]) {
-                for (pos[dirP2] = uiStart[dirP2]; pos[dirP2] <= uiStop[dirP2]; ++pos[dirP2]) {
+        for (pos[dirP1] = uiStart[dirP1]; pos[dirP1] <= uiStop[dirP1]; ++pos[dirP1]) {
+            for (pos[dirP2] = uiStart[dirP2]; pos[dirP2] <= uiStop[dirP2]; ++pos[dirP2]) {
+                for (pos[dir] = uiStart[dir]; pos[dir] < uiStop[dir]; ++pos[dir]) {
+                    if (isActive(pos)) {
+                        ++nParActive;
+                        break;
+                    }
+                }
+            }
+        }
+        if (nParActive == 0) {
+            continue; // the whole box is metal -- nothing left to carry the element
+        }
+
+        for (pos[dirP1] = uiStart[dirP1]; pos[dirP1] <= uiStop[dirP1]; ++pos[dirP1]) {
+            for (pos[dirP2] = uiStart[dirP2]; pos[dirP2] <= uiStop[dirP2]; ++pos[dirP2]) {
+                unsigned int nActive = 0;
+                for (pos[dir] = uiStart[dir]; pos[dir] < uiStop[dir]; ++pos[dir]) {
+                    if (isActive(pos)) ++nActive;
+                }
+                if (nActive == 0) continue;
+
+                const double dL = L * static_cast<double>(nParActive) / static_cast<double>(nActive);
+                const double dR = R * static_cast<double>(nParActive) / static_cast<double>(nActive);
+                const double dC = hasC ? C * static_cast<double>(nActive) / static_cast<double>(nParActive) : 0.0;
+
+                double ib0 = 0.0;
+                double b1 = 0.0;
+                double b2 = 0.0;
+                if (dC == 0.0) {
+                    ib0 = dT / (2.0 * dL + dT * dR);
+                    b1 = -4.0 * dL / dT;
+                    b2 = (2.0 * dL - dT * dR) / dT;
+                } else {
+                    ib0 = 2.0 * dT * dC / (4.0 * dL * dC + 2.0 * dT * dR * dC + dT * dT);
+                    b1 = (dT * dT - 4.0 * dL * dC) / (dT * dC);
+                    b2 = (4.0 * dL * dC - 2.0 * dT * dR * dC + dT * dT) / (2.0 * dT * dC);
+                }
+                // A SERIES element with no R, L, or C at all (dC==0 branch, dL==0, dR==0) makes ib0 =
+                // dT/0 = inf -- mathematically undefined for this ADE formulation, not just
+                // numerically unlucky (openEMS's own real Operator_Ext_LumpedRLC has the identical
+                // division and no guard against it either: IsLElumpedRLC() accepts every SERIES-type
+                // element regardless of its R/L/C values). A "lumped element" with no impedance at all
+                // isn't a real RLC in the FDTD sense -- whatever conductive geometry it represents is
+                // already captured as ordinary copper/PEC elsewhere -- so skip it here rather than
+                // injecting a NaN/Inf coefficient that corrupts the field on the very first
+                // applyLumpedRLC() call of the run.
+                if (!std::isfinite(ib0) || !std::isfinite(b1) || !std::isfinite(b2)) {
+                    continue;
+                }
+
+                for (pos[dir] = uiStart[dir]; pos[dir] < uiStop[dir]; ++pos[dir]) {
                     const std::uint32_t idx = copperGridIndex(grid.dims, pos[0], pos[1], pos[2]);
                     // See this file's header comment: with this cell's conductance already zeroed by
                     // the real Operator_Ext_LumpedRLC (which still runs for the GPU backend too, as
@@ -106,7 +132,7 @@ std::vector<CopperLumpedRLCCell> _discoverForProperty(CSPropLumpedElement& prop,
                     // way needs no vendor-internals access at all.
                     const double vi = static_cast<double>(grid.vi[dir][idx]);
                     if (vi == 0.0) {
-                        continue; // degenerate (e.g. PEC) cell -- Cd would be infinite, skip defensively
+                        continue; // metal (PEC) edge: already counted out of nActive above
                     }
                     const double cd = dT / vi;
 

@@ -25,6 +25,7 @@
 #include <mach/mach.h>
 #endif
 
+#include "CSRectGrid.h"
 #include "FieldFrameSeriesWriter.hpp"
 #include "Internal/CopperCPML.hpp"
 #include "Internal/CopperDomain.hpp"
@@ -1248,6 +1249,128 @@ std::string CopperProbeResult::data() const {
         out << sample.timeSeconds << "\t" << sample.value << "\n";
     }
     return out.str();
+}
+
+struct CopperMetalMap::Impl {
+    CopperGridDims dims;
+    std::array<std::vector<double>, 3> lines; // native CSX units, ascending
+    std::vector<std::uint32_t> region;        // per node; kNoMetal where no PEC edge touches it
+    static constexpr std::uint32_t kNoMetal = std::numeric_limits<std::uint32_t>::max();
+
+    std::uint32_t nearestLine(int axis, double coord) const {
+        const std::vector<double>& axisLines = lines[static_cast<std::size_t>(axis)];
+        const auto upper = std::lower_bound(axisLines.begin(), axisLines.end(), coord);
+        if (upper == axisLines.begin()) return 0;
+        if (upper == axisLines.end()) return static_cast<std::uint32_t>(axisLines.size() - 1);
+        const auto index = static_cast<std::uint32_t>(upper - axisLines.begin());
+        return (coord - axisLines[index - 1] <= axisLines[index] - coord) ? index - 1 : index;
+    }
+};
+
+CopperMetalMap::CopperMetalMap(ContinuousStructure& csx, const CopperFDTDPortConfig& portConfig)
+    : _impl(std::make_unique<Impl>()) {
+    // Open boundaries always: a PEC domain face would join every region that reaches it.
+    CopperOperator::Config config = copperOperatorConfig(portConfig);
+    config.boundary.fill(CopperOperator::BoundaryType::Open);
+    std::vector<std::uint32_t> parent;
+    {
+        const CopperOperator op(csx, config);
+        const CopperYeeGrid& grid = op.grid();
+        _impl->dims = grid.dims;
+        CSRectGrid* csRectGrid = csx.GetGrid();
+        for (int axis = 0; axis < 3; ++axis) {
+            unsigned int qty = 0;
+            double* axisLines = csRectGrid->GetLines(axis, nullptr, qty, /*sorted=*/true);
+            _impl->lines[static_cast<std::size_t>(axis)].assign(axisLines, axisLines + qty);
+            delete[] axisLines;
+        }
+
+        const CopperGridDims& dims = grid.dims;
+        const std::size_t nodeCount = dims.cellCount();
+        parent.resize(nodeCount);
+        for (std::size_t node = 0; node < nodeCount; ++node) parent[node] = static_cast<std::uint32_t>(node);
+        std::vector<bool> metal(nodeCount, false);
+        const auto find = [&](std::uint32_t node) {
+            while (parent[node] != node) {
+                parent[node] = parent[parent[node]];
+                node = parent[node];
+            }
+            return node;
+        };
+        // A PEC edge (vi == 0) joins the node it starts at to the next node along its axis.
+        const std::array<std::uint32_t, 3> stride = {1, dims.nx, dims.nx * dims.ny};
+        for (std::uint32_t z = 0; z < dims.nz; ++z) {
+            for (std::uint32_t y = 0; y < dims.ny; ++y) {
+                for (std::uint32_t x = 0; x < dims.nx; ++x) {
+                    const std::uint32_t node = copperGridIndex(dims, x, y, z);
+                    const std::array<bool, 3> hasNext = {x + 1 < dims.nx, y + 1 < dims.ny, z + 1 < dims.nz};
+                    for (std::size_t axis = 0; axis < 3; ++axis) {
+                        if (!hasNext[axis] || grid.vi[axis][node] != 0.0F) continue;
+                        const std::uint32_t next = node + stride[axis];
+                        metal[node] = true;
+                        metal[next] = true;
+                        const std::uint32_t a = find(node);
+                        const std::uint32_t b = find(next);
+                        if (a != b) parent[std::max(a, b)] = std::min(a, b);
+                    }
+                }
+            }
+        }
+        _impl->region.assign(nodeCount, Impl::kNoMetal);
+        for (std::size_t node = 0; node < nodeCount; ++node) {
+            if (metal[node]) _impl->region[node] = find(static_cast<std::uint32_t>(node));
+        }
+    }
+}
+
+CopperMetalMap::~CopperMetalMap() = default;
+CopperMetalMap::CopperMetalMap(CopperMetalMap&&) noexcept = default;
+CopperMetalMap& CopperMetalMap::operator=(CopperMetalMap&&) noexcept = default;
+
+std::optional<std::uint32_t> CopperMetalMap::regionAt(const std::array<double, 3>& point) const {
+    const CopperGridDims& dims = _impl->dims;
+    const std::array<std::uint32_t, 3> centre = {_impl->nearestLine(0, point[0]), _impl->nearestLine(1, point[1]),
+                                                 _impl->nearestLine(2, point[2])};
+    const auto at = [&](std::int64_t x, std::int64_t y, std::int64_t z) -> std::optional<std::uint32_t> {
+        if (x < 0 || y < 0 || z < 0 || x >= dims.nx || y >= dims.ny || z >= dims.nz) return std::nullopt;
+        const std::uint32_t label = _impl->region[copperGridIndex(dims, static_cast<std::uint32_t>(x),
+                                                                  static_cast<std::uint32_t>(y),
+                                                                  static_cast<std::uint32_t>(z))];
+        if (label == Impl::kNoMetal) return std::nullopt;
+        return label;
+    };
+    if (auto label = at(centre[0], centre[1], centre[2])) return label;
+    // A pad centre can fall on a line just past its copper; stay in its own layer (same z).
+    for (std::int64_t dy = -1; dy <= 1; ++dy) {
+        for (std::int64_t dx = -1; dx <= 1; ++dx) {
+            if (auto label = at(centre[0] + dx, centre[1] + dy, centre[2])) return label;
+        }
+    }
+    return std::nullopt;
+}
+
+std::vector<std::uint32_t> CopperMetalMap::regionsIn(const std::array<double, 3>& start,
+                                                     const std::array<double, 3>& stop) const {
+    const CopperGridDims& dims = _impl->dims;
+    std::array<std::uint32_t, 3> lo{}, hi{};
+    for (int axis = 0; axis < 3; ++axis) {
+        const auto a = _impl->nearestLine(axis, std::min(start[axis], stop[axis]));
+        const auto b = _impl->nearestLine(axis, std::max(start[axis], stop[axis]));
+        lo[static_cast<std::size_t>(axis)] = a;
+        hi[static_cast<std::size_t>(axis)] = b;
+    }
+    std::vector<std::uint32_t> regions;
+    for (std::uint32_t z = lo[2]; z <= hi[2] && z < dims.nz; ++z) {
+        for (std::uint32_t y = lo[1]; y <= hi[1] && y < dims.ny; ++y) {
+            for (std::uint32_t x = lo[0]; x <= hi[0] && x < dims.nx; ++x) {
+                const std::uint32_t label = _impl->region[copperGridIndex(dims, x, y, z)];
+                if (label != Impl::kNoMetal && std::find(regions.begin(), regions.end(), label) == regions.end()) {
+                    regions.push_back(label);
+                }
+            }
+        }
+    }
+    return regions;
 }
 
 } // namespace copper
