@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 
 #include <CSPropExcitation.h>
@@ -13,6 +14,7 @@
 #include <CSPrimPolygon.h>
 #include <CSRectGrid.h>
 
+#include "CopperConformal.hpp"
 #include "CopperPhysicalConstants.hpp"
 
 namespace copper {
@@ -926,7 +928,11 @@ void CopperOperator::computePEC() {
     std::vector<PrimitiveRange> primitiveRanges(pecTypeCache.prims.size());
     std::vector<PolygonRasterShape> primitiveShapes(pecTypeCache.prims.size());
     std::vector<std::uint8_t> canRasterize(pecTypeCache.prims.size(), 0);
+    // A conformal prism decides only its Z edges here; applyConformalPEC() owns its X and Y edges.
+    std::vector<std::uint8_t> conformalPrism(pecTypeCache.prims.size(), 0);
     for (std::size_t i = 0; i < pecTypeCache.prims.size(); ++i) {
+        conformalPrism[i] = pecTypeCache.prims[i]->ToLinPoly() != nullptr &&
+                            pecTypeCache.prims[i]->GetProperty()->ExistAttribute(kConformalAttribute);
         const double* bb = pecTypeCache.boundBoxes[i].box.data();
         bool bounded = true;
         for (int n = 0; n < 6; ++n) {
@@ -973,7 +979,7 @@ void CopperOperator::computePEC() {
 
             if (canRasterize[*it] != 0) {
                 const PolygonRasterShape& shape = primitiveShapes[*it];
-                for (int axis = 0; axis < 3; ++axis) {
+                for (int axis = conformalPrism[*it] != 0 ? 2 : 0; axis < 3; ++axis) {
                     const double rowCoord = (axis == 1) ? yDual[y] : yPrimary[y];
                     const std::vector<double>& fullCols = (axis == 0) ? xDual : xPrimary;
                     const auto cols = std::span<const double>(fullCols).subspan(xStart, xStopEx - xStart);
@@ -1060,14 +1066,15 @@ void CopperOperator::zeroOuterHLayer() {
 // against AdrOp::GetPos's own reflection formula (`muiIrel=-2*uiIpos-muiIrel-uiTypeOffset` etc, with
 // uiTypeOffset=1 for cell reflection) rather than re-deriving AdrOp's own indexing class. ----
 
-double CopperOperator::calcTimestepVar3() const {
-    double dT = 1e200;
+double CopperOperator::localTimestepVar3(int n, const unsigned int pos[3]) const {
     const unsigned int nx = numLines(0);
     const unsigned int ny = numLines(1);
     const unsigned int nz = numLines(2);
+    const int nP = (n + 1) % 3;
+    const int nPP = (n + 2) % 3;
 
     // Shifts `base` by `shift[axis]` per axis (each entry in {-1,0,1} only, ever), reflecting an
-    // out-of-range result back to `base` itself on that axis -- see this function's own top comment.
+    // out-of-range result back to `base` itself on that axis -- see this section's own top comment.
     auto shiftedIndex = [&](const unsigned int base[3], const int shift[3]) -> std::size_t {
         unsigned int p[3];
         const unsigned int lineCount[3] = {nx, ny, nz};
@@ -1078,67 +1085,333 @@ double CopperOperator::calcTimestepVar3() const {
         return index(p[0], p[1], p[2]);
     };
 
+    const std::size_t ipos0 = index(pos[0], pos[1], pos[2]);
+    // An edge or face held inert (applyConformalPEC(): metal, so no unknown at all) is absent from
+    // the system: an inert edge's own row sets no limit, and inert couplings drop out of the sums
+    // and of the minimum the Var3 estimate subtracts -- left in as zeros, they would be taken as the
+    // minimum and loosen the estimate's cancellation, as if removing an edge could cost timestep.
+    if (_ecC[n][ipos0] >= kInertCoefficient) return std::numeric_limits<double>::infinity();
+    int shift[3] = {0, 0, 0};
+    int tmp[3];
+    auto withTemp = [&](int axis, int step) {
+        tmp[0] = shift[0];
+        tmp[1] = shift[1];
+        tmp[2] = shift[2];
+        tmp[axis] += step;
+        return shiftedIndex(pos, tmp);
+    };
+
+    double wqp = 1.0 / (_ecL[nPP][ipos0] * _ecC[n][withTemp(nP, 1)]) + 1.0 / (_ecL[nPP][ipos0] * _ecC[n][ipos0]);
+    wqp += 1.0 / (_ecL[nP][ipos0] * _ecC[n][withTemp(nPP, 1)]) + 1.0 / (_ecL[nP][ipos0] * _ecC[n][ipos0]);
+
+    shift[nP] = -1;
+    const std::size_t iposA = shiftedIndex(pos, shift);
+    wqp += 1.0 / (_ecL[nPP][iposA] * _ecC[n][withTemp(nP, 1)]) + 1.0 / (_ecL[nPP][iposA] * _ecC[n][iposA]);
+
+    shift[nPP] = -1;
+    const std::size_t iposB = shiftedIndex(pos, shift);
+    wqp += 1.0 / (_ecL[nP][iposB] * _ecC[n][withTemp(nPP, 1)]) + 1.0 / (_ecL[nP][iposB] * _ecC[n][iposB]);
+
+    // The sum of the present couplings less twice the smallest of them.
+    const auto couplings = [](const std::array<std::pair<double, double>, 4>& lc) {
+        double sum = 0.0;
+        double smallest = std::numeric_limits<double>::infinity();
+        for (const auto& [l, c] : lc) {
+            if (l >= kInertCoefficient || c >= kInertCoefficient) continue;
+            const double w = 1.0 / (l * c);
+            sum += w;
+            smallest = std::min(smallest, w);
+        }
+        return std::isfinite(smallest) ? sum - 2.0 * smallest : 0.0;
+    };
+    shift[0] = shift[1] = shift[2] = 0;
+    const double wt1 = couplings({std::pair{_ecL[nPP][ipos0], _ecC[nP][ipos0]},
+                                  std::pair{_ecL[nPP][withTemp(nP, -1)], _ecC[nP][ipos0]},
+                                  std::pair{_ecL[nP][ipos0], _ecC[nPP][ipos0]},
+                                  std::pair{_ecL[nP][withTemp(nPP, -1)], _ecC[nPP][ipos0]}});
+    shift[0] = shift[1] = shift[2] = 0;
+    const double wt2 = couplings({std::pair{_ecL[nPP][ipos0], _ecC[nP][withTemp(n, 1)]},
+                                  std::pair{_ecL[nPP][withTemp(nP, -1)], _ecC[nP][withTemp(n, 1)]},
+                                  std::pair{_ecL[nP][ipos0], _ecC[nPP][withTemp(n, 1)]},
+                                  std::pair{_ecL[nP][withTemp(nPP, -1)], _ecC[nPP][withTemp(n, 1)]}});
+
+    const double newT = 2.0 / std::sqrt(wqp + wt1 + wt2);
+    return newT > 0.0 ? newT : std::numeric_limits<double>::infinity();
+}
+
+double CopperOperator::calcTimestepVar3() const {
+    double dT = 1e200;
     unsigned int pos[3];
     for (int n = 0; n < 3; ++n) {
-        const int nP = (n + 1) % 3;
-        const int nPP = (n + 2) % 3;
-
-        for (pos[2] = 0; pos[2] < nz; ++pos[2]) {
-            for (pos[1] = 0; pos[1] < ny; ++pos[1]) {
-                for (pos[0] = 0; pos[0] < nx; ++pos[0]) {
-                    const std::size_t ipos0 = index(pos[0], pos[1], pos[2]);
-                    int shift[3] = {0, 0, 0};
-                    int tmp[3];
-                    auto withTemp = [&](int axis, int step) {
-                        tmp[0] = shift[0];
-                        tmp[1] = shift[1];
-                        tmp[2] = shift[2];
-                        tmp[axis] += step;
-                        return shiftedIndex(pos, tmp);
-                    };
-
-                    double wqp = 1.0 / (_ecL[nPP][ipos0] * _ecC[n][withTemp(nP, 1)]) +
-                                 1.0 / (_ecL[nPP][ipos0] * _ecC[n][ipos0]);
-                    wqp += 1.0 / (_ecL[nP][ipos0] * _ecC[n][withTemp(nPP, 1)]) +
-                           1.0 / (_ecL[nP][ipos0] * _ecC[n][ipos0]);
-
-                    shift[nP] = -1;
-                    const std::size_t iposA = shiftedIndex(pos, shift);
-                    wqp += 1.0 / (_ecL[nPP][iposA] * _ecC[n][withTemp(nP, 1)]) +
-                           1.0 / (_ecL[nPP][iposA] * _ecC[n][iposA]);
-
-                    shift[nPP] = -1;
-                    const std::size_t iposB = shiftedIndex(pos, shift);
-                    wqp += 1.0 / (_ecL[nP][iposB] * _ecC[n][withTemp(nPP, 1)]) +
-                           1.0 / (_ecL[nP][iposB] * _ecC[n][iposB]);
-
-                    shift[0] = shift[1] = shift[2] = 0;
-                    double wt4[4];
-                    wt4[0] = 1.0 / (_ecL[nPP][ipos0] * _ecC[nP][ipos0]);
-                    wt4[1] = 1.0 / (_ecL[nPP][withTemp(nP, -1)] * _ecC[nP][ipos0]);
-                    wt4[2] = 1.0 / (_ecL[nP][ipos0] * _ecC[nPP][ipos0]);
-                    wt4[3] = 1.0 / (_ecL[nP][withTemp(nPP, -1)] * _ecC[nPP][ipos0]);
-                    const double wt1 = wt4[0] + wt4[1] + wt4[2] + wt4[3] -
-                                        2.0 * *std::min_element(wt4, wt4 + 4);
-
-                    shift[0] = shift[1] = shift[2] = 0;
-                    wt4[0] = 1.0 / (_ecL[nPP][ipos0] * _ecC[nP][withTemp(n, 1)]);
-                    wt4[1] = 1.0 / (_ecL[nPP][withTemp(nP, -1)] * _ecC[nP][withTemp(n, 1)]);
-                    wt4[2] = 1.0 / (_ecL[nP][ipos0] * _ecC[nPP][withTemp(n, 1)]);
-                    wt4[3] = 1.0 / (_ecL[nP][withTemp(nPP, -1)] * _ecC[nPP][withTemp(n, 1)]);
-                    const double wt2 = wt4[0] + wt4[1] + wt4[2] + wt4[3] -
-                                        2.0 * *std::min_element(wt4, wt4 + 4);
-
-                    const double wTotal = wqp + wt1 + wt2;
-                    const double newT = 2.0 / std::sqrt(wTotal);
-                    if (newT < dT && newT > 0.0) {
-                        dT = newT;
-                    }
+        for (pos[2] = 0; pos[2] < numLines(2); ++pos[2]) {
+            for (pos[1] = 0; pos[1] < numLines(1); ++pos[1]) {
+                for (pos[0] = 0; pos[0] < numLines(0); ++pos[0]) {
+                    dT = std::min(dT, localTimestepVar3(n, pos));
                 }
             }
         }
     }
     return dT;
+}
+
+// ---- conformal metal and thin wires -- see CopperConformal.hpp and applyConformalPEC()'s own doc
+// comment ----
+
+bool CopperOperator::hasConformalGeometry() const {
+    const CSProperties::PropertyType pecType =
+        static_cast<CSProperties::PropertyType>(CSProperties::MATERIAL | CSProperties::METAL);
+    for (CSPrimitives* prim : primitiveTypeCache(pecType).prims) {
+        const CSProperties* property = prim->GetProperty();
+        if (property->ExistAttribute(kConformalAttribute) || property->ExistAttribute(kThinWireRadiusAttribute)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void CopperOperator::applyConformalPEC(double baseTimestep) {
+    // Fractions are snapped to 1/128ths: finer than any geometry the mesh resolves, and coarse
+    // enough that the coefficient table (CopperCoefficientTable) keeps few distinct entries.
+    constexpr double kQuantum = 1.0 / 128.0;
+    const auto quantise = [](double fraction) { return std::clamp(std::round(fraction / kQuantum) * kQuantum, 0.0, 1.0); };
+    // An edge or face with no dynamics, for the timestep derivation only -- see localTimestepVar3().
+    const auto holdInert = [&](bool electric, int axis, std::size_t i) {
+        std::vector<double>& values = electric ? _ecC[axis] : _ecL[axis];
+        if (values[i] >= kInertCoefficient) return;
+        _inertCoefficients.push_back({electric, axis, i, values[i]});
+        values[i] = kInertCoefficient;
+    };
+
+    const auto& X = _rawLines[0];
+    const auto& Y = _rawLines[1];
+    const auto& Z = _rawLines[2];
+    const unsigned int nx = numLines(0), ny = numLines(1), nz = numLines(2);
+    const auto lineRange = [](const std::vector<double>& lines, double lo, double hi) {
+        auto first = static_cast<unsigned int>(std::lower_bound(lines.begin(), lines.end(), lo) - lines.begin());
+        auto last = static_cast<unsigned int>(std::upper_bound(lines.begin(), lines.end(), hi) - lines.begin());
+        if (first > 0) --first;
+        return std::pair{first, std::min<unsigned int>(last + 1, static_cast<unsigned int>(lines.size()))};
+    };
+
+    const CSProperties::PropertyType pecType =
+        static_cast<CSProperties::PropertyType>(CSProperties::MATERIAL | CSProperties::METAL);
+    const PrimitiveTypeCache& cache = primitiveTypeCache(pecType);
+    std::vector<std::array<unsigned int, 4>> faces; // axis, x, y, z of every partly open face
+    for (std::size_t p = 0; p < cache.prims.size(); ++p) {
+        CSPrimitives* prim = cache.prims[p];
+        if (!prim->GetProperty()->ExistAttribute(kConformalAttribute) || !cache.boundBoxes[p].ok) continue;
+        PolygonRasterShape shape;
+        if (!tryBuildPolygonRasterShape(prim, shape) || prim->ToLinPoly() == nullptr) continue;
+        const conformal::Polygon polygon{shape.x, shape.y};
+        const auto& bb = cache.boundBoxes[p].box;
+        const double zLo = std::min(bb[4], bb[5]), zHi = std::max(bb[4], bb[5]);
+        const auto [x0, x1] = lineRange(X, std::min(bb[0], bb[1]), std::max(bb[0], bb[1]));
+        const auto [y0, y1] = lineRange(Y, std::min(bb[2], bb[3]), std::max(bb[2], bb[3]));
+        const auto [z0, z1] = lineRange(Z, zLo, zHi);
+
+        // Z edges at nodes inside: metal, decided by computePEC() exactly as for any prism.
+        std::vector<std::uint8_t> inside(x1 - x0);
+        PolygonRasterScratch scratch;
+        for (unsigned int y = y0; y < y1; ++y) {
+            rasterizePolygonRowBytes(shape, Y[y], std::span<const double>(X).subspan(x0, x1 - x0), inside, scratch);
+            for (unsigned int z = z0; z + 1 < nz && z < z1; ++z) {
+                const double zMid = (Z[z] + Z[z + 1]) / 2;
+                if (zMid < zLo || zMid > zHi) continue;
+                for (unsigned int x = x0; x < x1; ++x) {
+                    if (inside[x - x0]) holdInert(true, 2, index(x, y, z));
+                }
+            }
+        }
+
+        for (unsigned int z = z0; z < z1; ++z) {
+            const bool onLine = Z[z] >= zLo && Z[z] <= zHi;
+            const double cellOverlap =
+                z + 1 < nz ? std::max(0.0, std::min(Z[z + 1], zHi) - std::max(Z[z], zLo)) / (Z[z + 1] - Z[z]) : 0.0;
+            for (unsigned int y = y0; y < y1; ++y) {
+                for (unsigned int x = x0; x < x1; ++x) {
+                    const std::size_t i = index(x, y, z);
+                    const double dx = x + 1 < nx ? X[x + 1] - X[x] : 0.0;
+                    const double dy = y + 1 < ny ? Y[y + 1] - Y[y] : 0.0;
+                    const double insideX = dx > 0 ? conformal::insideLength(polygon, true, Y[y], X[x], X[x + 1]) / dx : 0.0;
+                    const double insideY = dy > 0 ? conformal::insideLength(polygon, false, X[x], Y[y], Y[y + 1]) / dy : 0.0;
+                    if (onLine) {
+                        // X and Y edges on this plane carry only their open length.
+                        for (const auto& [axis, covered] : {std::pair{0, insideX}, std::pair{1, insideY}}) {
+                            if (covered <= 0.0) continue;
+                            const double open = quantise(1.0 - covered);
+                            if (open <= 0.0) {
+                                _conformalMetalEdges.emplace_back(axis, i);
+                                holdInert(true, axis, i);
+                            } else if (open < 1.0) {
+                                _ecC[axis][i] /= open;
+                                _ecG[axis][i] /= open;
+                            }
+                        }
+                        // The Z face on this plane carries flux through its open area only.
+                        if (dx > 0 && dy > 0) {
+                            const double covered = conformal::insideArea(polygon, X[x], X[x + 1], Y[y], Y[y + 1]) / (dx * dy);
+                            if (covered > 0.0) faces.push_back({2, x, y, z});
+                        }
+                    }
+                    // X and Y faces between this plane and the next, by the share of their edge
+                    // inside the cross-section times their share of the prism's height.
+                    if (cellOverlap > 0.0) {
+                        if (insideY > 0.0) faces.push_back({0, x, y, z});
+                        if (insideX > 0.0) faces.push_back({1, x, y, z});
+                    }
+                }
+            }
+        }
+
+        // Each cut face carries flux through its open area only, unless that would cost more
+        // timestep than kConformalStability allows -- see below.
+        for (const auto& [axis, x, y, z] : faces) {
+            const std::size_t i = index(x, y, z);
+            double covered = 0.0;
+            if (axis == 2) {
+                covered = conformal::insideArea(polygon, X[x], X[x + 1], Y[y], Y[y + 1]) / ((X[x + 1] - X[x]) * (Y[y + 1] - Y[y]));
+            } else {
+                const double overlap = std::max(0.0, std::min(Z[z + 1], zHi) - std::max(Z[z], zLo)) / (Z[z + 1] - Z[z]);
+                covered = overlap * (axis == 0 ? conformal::insideLength(polygon, false, X[x], Y[y], Y[y + 1]) / (Y[y + 1] - Y[y])
+                                               : conformal::insideLength(polygon, true, Y[y], X[x], X[x + 1]) / (X[x + 1] - X[x]));
+            }
+            const double open = quantise(1.0 - covered);
+            if (open >= 1.0 || _ecL[axis][i] >= kInertCoefficient) continue;
+            if (open <= 0.0) {
+                // Wholly inside, bounded by metal edges: no dynamics.
+                _conformalClosedFaces.emplace_back(axis, i);
+                holdInert(false, axis, i);
+                continue;
+            }
+            // The flux through the open area alone raises this face's coefficient by 1/open. Where that
+            // would cost more timestep than allowed, the face gives up a little geometric precision
+            // instead, as Benkler et al. trade it: whichever misplaces less of it, either it keeps the
+            // smallest open fraction that is stable, or (a sliver) it joins the metal.
+            const double inductance = _ecL[axis][i];
+            const double resistance = _ecR[axis][i];
+            const int a1 = (axis + 1) % 3, a2 = (axis + 2) % 3;
+            const unsigned int lines[3] = {nx, ny, nz};
+            const unsigned int face[3] = {x, y, z};
+            // localTimestepVar3(n, pos) reads the face along nPP at pos and pos - e(nP), and along nP
+            // at pos, pos - e(nPP) and pos - e(nP) - e(nPP).
+            struct Term {
+                int n;
+                int shiftA, shiftB; // -1 for none
+            };
+            const Term terms[5] = {{a1, -1, -1}, {a1, a2, -1}, {a2, -1, -1}, {a2, a1, -1}, {a2, a1, static_cast<int>(axis)}};
+            const auto stableWith = [&](double fraction) {
+                _ecL[axis][i] = inductance * fraction;
+                for (const Term& term : terms) {
+                    unsigned int pos[3] = {face[0], face[1], face[2]};
+                    bool inside = true;
+                    for (const int shift : {term.shiftA, term.shiftB}) {
+                        if (shift < 0) continue;
+                        if (pos[shift] + 1 >= lines[shift]) inside = false;
+                        else ++pos[shift];
+                    }
+                    if (inside && localTimestepVar3(term.n, pos) < kConformalStability * baseTimestep) return false;
+                }
+                return true;
+            };
+            double fraction = open;
+            if (!stableWith(fraction)) {
+                double lo = open, hi = 1.0;
+                for (int step = 0; step < 12; ++step) {
+                    const double mid = (lo + hi) / 2;
+                    (stableWith(mid) ? hi : lo) = mid;
+                }
+                fraction = quantise(hi + kQuantum / 2);
+                if (open < fraction - open) {
+                    // The face closes and every edge around it becomes metal too: an open edge left
+                    // facing a closed face would act as a magnetic wall and choke the current around
+                    // the conductor. The surface moves out here by the sliver, as Dey and Mittra
+                    // treat their smallest cells.
+                    _ecL[axis][i] = inductance;
+                    _conformalClosedFaces.emplace_back(axis, i);
+                    holdInert(false, axis, i);
+                    const int p1 = (axis + 1) % 3, p2 = (axis + 2) % 3;
+                    for (const auto& [edgeAxis, along] : {std::pair{p1, p2}, std::pair{p2, p1}}) {
+                        for (const unsigned int step : {0U, 1U}) {
+                            unsigned int pos[3] = {face[0], face[1], face[2]};
+                            pos[along] += step;
+                            if (pos[along] >= lines[along]) continue;
+                            const std::size_t edge = index(pos[0], pos[1], pos[2]);
+                            _conformalMetalEdges.emplace_back(edgeAxis, edge);
+                            holdInert(true, edgeAxis, edge);
+                        }
+                    }
+                    continue;
+                }
+            }
+            _ecL[axis][i] = inductance * fraction;
+            _ecR[axis][i] = resistance * fraction;
+        }
+        faces.clear();
+    }
+
+    // Thin wires: Railton's modified parameters on the four radial edges and the faces circling the
+    // wire, along every node of the box's line.
+    for (std::size_t p = 0; p < cache.prims.size(); ++p) {
+        CSPrimitives* prim = cache.prims[p];
+        const CSProperties* property = prim->GetProperty();
+        if (!property->ExistAttribute(kThinWireRadiusAttribute) || !cache.boundBoxes[p].ok) continue;
+        const double radius = std::atof(property->GetAttributeValue(kThinWireRadiusAttribute).c_str());
+        const auto& bb = cache.boundBoxes[p].box;
+        const double centre[3] = {(bb[0] + bb[1]) / 2, (bb[2] + bb[3]) / 2, (bb[4] + bb[5]) / 2};
+        unsigned int node[3];
+        snapToMesh(centre, node, false);
+        const unsigned int x = node[0], y = node[1];
+        if (!(radius > 0.0) || x == 0 || y == 0 || x + 1 >= nx || y + 1 >= ny) continue;
+        const double zLo = std::min(bb[4], bb[5]), zHi = std::max(bb[4], bb[5]);
+        const double acrossX = (X[x + 1] - X[x - 1]) / 2, acrossY = (Y[y + 1] - Y[y - 1]) / 2;
+        // Each radial edge: its axis, the position of its own index, its length, and the face beside it.
+        struct Radial {
+            int axis;
+            unsigned int ex, ey;
+            double along, across;
+        };
+        const Radial radials[4] = {{0, x, y, X[x + 1] - X[x], acrossY},
+                                   {0, x - 1, y, X[x] - X[x - 1], acrossY},
+                                   {1, x, y, Y[y + 1] - Y[y], acrossX},
+                                   {1, x, y - 1, Y[y] - Y[y - 1], acrossX}};
+        for (unsigned int z = 0; z < nz; ++z) {
+            const bool onLine = Z[z] >= zLo && Z[z] <= zHi;
+            const bool cellInside = z + 1 < nz && Z[z] >= zLo && Z[z + 1] <= zHi;
+            for (const Radial& radial : radials) {
+                if (radius >= 0.9 * radial.along) continue; // the wire fills its cell: no thin-wire regime
+                const double mu = conformal::thinWirePermeabilityFactor(radius, radial.along, radial.across);
+                const std::size_t i = index(radial.ex, radial.ey, z);
+                if (onLine) {
+                    _ecC[radial.axis][i] /= mu;
+                    _ecG[radial.axis][i] /= mu;
+                }
+                // The H component circling the wire beside a radial X edge is Hy, beside a Y edge Hx.
+                if (cellInside) {
+                    const int circling = radial.axis == 0 ? 1 : 0;
+                    _ecL[circling][i] *= mu;
+                    _ecR[circling][i] *= mu;
+                }
+            }
+        }
+    }
+}
+
+void CopperOperator::restoreInertCoefficients() {
+    for (const InertCoefficient& held : _inertCoefficients) {
+        (held.electric ? _ecC : _ecL)[held.axis][held.index] = held.value;
+    }
+    _inertCoefficients.clear();
+}
+
+void CopperOperator::zeroConformalPEC() {
+    for (const auto& [axis, i] : _conformalMetalEdges) {
+        _grid.vv[axis][i] = 0.0F;
+        _grid.vi[axis][i] = 0.0F;
+    }
+    for (const auto& [axis, i] : _conformalClosedFaces) {
+        _grid.ii[axis][i] = 0.0F;
+        _grid.iv[axis][i] = 0.0F;
+    }
 }
 
 // ---- excitation -- ported from Excitation::CalcGaussianPulsExcitation +
@@ -1415,9 +1688,13 @@ CopperOperator::CopperOperator(ContinuousStructure& csx, const Config& config) :
     }
 
     computeMaterialCoefficients();
+    if (hasConformalGeometry()) {
+        applyConformalPEC(calcTimestepVar3());
+    }
 
     const double dT = calcTimestepVar3();
     _grid.timestepSeconds = dT;
+    restoreInertCoefficients();
 
     for (int n = 0; n < 3; ++n) {
         for (unsigned int z = 0; z < numLines(2); ++z) {
@@ -1449,6 +1726,7 @@ CopperOperator::CopperOperator(ContinuousStructure& csx, const Config& config) :
 
     computeBoundaryPEC();
     computePEC();
+    zeroConformalPEC();
     zeroOuterHLayer();
     computeParallelLumpedElements();
     computeExcitation();

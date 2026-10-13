@@ -87,6 +87,24 @@ public:
         std::vector<double> x, y;
     };
 
+    /// A metal property carrying this attribute (any value) has each of its z-normal CSPrimLinPoly
+    /// primitives treated conformally: Z edges at nodes inside the prism are metal as usual, and every
+    /// X/Y edge and face its cross-section cuts carries only its open part (see CopperConformal.hpp).
+    static constexpr const char* kConformalAttribute = "copper:conformal";
+    /// A metal property carrying this attribute, set to a radius in drawing units, is a thin wire:
+    /// each of its boxes marks one line of nodes, and the edges around that line take Railton's
+    /// modified material parameters for a wire of that radius (see CopperConformal.hpp).
+    static constexpr const char* kThinWireRadiusAttribute = "copper:thin_wire_radius";
+    /// The fraction of `baseTimestep` a conformal face may pull its neighbourhood's stable timestep
+    /// down to before it gives up geometric precision instead -- see applyConformalPEC(). One: a
+    /// conformal face never costs timestep. Allowing 5-10% loss measurably helps only conductors
+    /// four or more cells across (coax tests in CopperConformalTests), not vias against a board's
+    /// mesh, so it isn't worth the extra steps.
+    static constexpr double kConformalStability = 1.0;
+    /// The value an edge's capacitance or a face's inductance is held at while the timestep is
+    /// derived, marking it metal: no unknown, so absent from the estimate (see localTimestepVar3()).
+    static constexpr double kInertCoefficient = 1e30;
+
     /// Extracts `prim`'s vertex list into `outShape` if it's eligible for the scanline fast path:
     /// a CSPrimPolygon or CSPrimLinPoly, Cartesian, untransformed, with normal direction Z (2) --
     /// the only shape libkiems itself ever creates for copper/dielectric geometry (see this file's
@@ -264,6 +282,38 @@ private:
 
     // -- timestep (ported from Operator::CalcTimestep_Var3) --
     double calcTimestepVar3() const;
+    /// One E edge's term of calcTimestepVar3()'s minimum: the timestep its own neighbourhood allows.
+    double localTimestepVar3(int n, const unsigned int pos[3]) const;
+
+    // -- conformal metal and thin wires (see CopperConformal.hpp) --
+    /// Whether any metal property asks for conformal treatment (attribute kConformalAttribute) or is a
+    /// thin wire (kThinWireRadiusAttribute) -- applyConformalPEC() has nothing to do otherwise.
+    bool hasConformalGeometry() const;
+    /// Folds the cut edges and faces of every conformal metal prism (a z-normal CSPrimLinPoly on a
+    /// property carrying kConformalAttribute) into _ecC/_ecG/_ecL/_ecR, and every thin wire's
+    /// modified material parameters into the edges around it, before the timestep is derived from
+    /// them. Everything wholly inside a prism is held inert for that derivation and recorded for
+    /// zeroConformalPEC(). A face whose open area would pull its neighbourhood's stable timestep
+    /// below kConformalStability of `baseTimestep` gives up a little geometric precision instead --
+    /// it keeps the smallest stable fraction, or a sliver joins the metal with its edges -- as
+    /// Benkler, Chavannes and Kuster trade theirs ("A new 3-D conformal PEC FDTD scheme with
+    /// user-defined geometric precision and derived stability criterion", IEEE TAP 54(6), 2006).
+    void applyConformalPEC(double baseTimestep);
+    /// Restores the real coefficients applyConformalPEC() held inert, so vv/vi/ii/iv (and any lumped
+    /// element painted over them later) see them.
+    void restoreInertCoefficients();
+    /// Zeroes the edges and faces applyConformalPEC() found inside metal. Runs after computePEC() and
+    /// before the lumped elements, which keep overriding metal as they always have.
+    void zeroConformalPEC();
+    struct InertCoefficient {
+        bool electric;
+        int axis;
+        std::size_t index;
+        double value;
+    };
+    std::vector<InertCoefficient> _inertCoefficients;
+    std::vector<std::pair<int, std::size_t>> _conformalMetalEdges;
+    std::vector<std::pair<int, std::size_t>> _conformalClosedFaces;
 
     std::size_t index(unsigned int x, unsigned int y, unsigned int z) const { return copperGridIndex(_grid.dims, x, y, z); }
 
