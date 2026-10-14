@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include "FieldFrameSeriesWriter.hpp"
+
 // Deliberately forward-declared, not #included, so callers do not inherit CSXCAD's large public
 // header surface merely to pass their geometry into Copper.
 class ContinuousStructure;
@@ -67,6 +69,10 @@ struct FieldFrameSeriesRequest {
     double boardZMax = 0.0;
     /// See FieldFrameSeriesWriter::create()'s own `chunkFrames` parameter.
     std::uint32_t chunkFrames = 16;
+    /// How each frame's full-resolution detail is stored -- see FieldFrameStorage.
+    FieldFrameStorage storage;
+    /// A frame is stored every this many timesteps, plus the first and last. Zero is treated as one.
+    std::uint32_t captureIntervalSteps = 1000;
     /// Called after the file has been created and entered SWMR-write mode, before frame generation
     /// starts. A live viewer can begin opening `path` here without racing file creation or mistaking
     /// a stale file from an earlier run for this one.

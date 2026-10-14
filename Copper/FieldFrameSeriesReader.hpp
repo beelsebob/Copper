@@ -25,10 +25,13 @@ struct FieldComponentRange {
     bool operator==(const FieldComponentRange&) const = default;
 };
 
+/// One preview cell's full-resolution block. A components series fills `components` (Ex..Hz) and
+/// leaves `energy` empty; an energy-only series fills `energy` and leaves `components` empty.
 struct FieldPreviewCellDetail {
     std::uint32_t previewCellIndex = 0;
     std::uint32_t nx = 0, ny = 0, nz = 0;
     std::array<std::vector<float>, 6> components;
+    std::vector<float> energy;
 };
 
 /// Reads a field frame-series file written by FieldFrameSeriesWriter. Opens once; header() and
@@ -65,13 +68,15 @@ public:
 
     /// Fills every one of the six caller-provided buffers (resized as needed) with frame `index`'s
     /// own `nx*ny*nz` values, x-fastest-varying -- same convention as FieldFrameSeriesWriter::
-    /// writeFrame()'s own inputs. Returns an error if `index >= frameCount()`.
+    /// writeFrame()'s own inputs. Returns an error if `index >= frameCount()`, or if the series stores
+    /// only energy. Quantized precisions return the dequantized values.
     std::expected<void, std::string> readFrame(std::uint32_t index, std::vector<float>& ex, std::vector<float>& ey,
                                                  std::vector<float>& ez, std::vector<float>& hx,
                                                  std::vector<float>& hy, std::vector<float>& hz) const;
 
     /// Reads the small playback representation. `energy` is max pooled (preserves narrow peaks),
     /// while the six signed fields are block means (supports approximate differential combining).
+    /// An energy-only series (header().storage) leaves the six signed fields empty.
     std::expected<void, std::string> readPreviewFrame(std::uint32_t index, std::vector<float>& energy,
                                                         std::vector<float>& ex, std::vector<float>& ey,
                                                         std::vector<float>& ez, std::vector<float>& hx,
@@ -128,7 +133,8 @@ public:
 
     /// Signed extrema for one component in one frame. The overload without a frame index returns
     /// the aggregate range across the whole series, allowing stable playback normalization without
-    /// reading any field-data chunk; it is nullopt only when the series contains no frames.
+    /// reading any field-data chunk; it is nullopt only when the series contains no frames. An
+    /// energy-only series has no component ranges: {0, 0} and nullopt.
     FieldComponentRange componentRange(FieldComponent component, std::uint32_t index) const;
     std::optional<FieldComponentRange> componentRange(FieldComponent component) const;
 

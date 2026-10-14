@@ -1,8 +1,23 @@
-# Field frame-series format (version 4)
+# Field frame-series format (version 5)
 
-One HDF5 file stores the captured field time series for one simulation/excited-port pair. Version 4
-is intentionally the only supported revision while the format is still a prototype; opening an old
-file reports that the simulation must be rerun.
+One HDF5 file stores the captured field time series for one simulation/excited-port pair. Version 5
+adds the storage options below. A version 4 file is identical to a version 5 file stored as
+`float32` `components`, and still opens; anything older reports that the simulation must be rerun.
+
+## Storage options
+
+The writer's `Header::storage` chooses how full-resolution detail is kept:
+
+- **Channels.** `components` stores the six signed E/H components. `energy` stores only
+  `eps0*|E|² + mu0*|H|²`, a sixth of the data, but with no field sign or direction, so nothing that
+  combines several excitations (such as a differential pair's legs) can be built from it.
+- **Precision.** `float32` is lossless (XOR residuals, below). `int8`, `int12` and `float16` store
+  each sample divided by its channel's peak magnitude in that frame: `max(|min|, |max|)` from the
+  component's per-frame range, or `max_energy` for energy. The quotient is clamped to [-1, 1]
+  ([0, 1] for energy) and stored as a signed or unsigned 8-bit integer scaled by 127 or 255, a
+  16-bit integer scaled by 2047 or 4095 (the unused high bits compress away), or an IEEE half
+  float's bit pattern. Normalizing keeps half floats from overflowing on large E fields or
+  underflowing on tiny energies.
 
 The format has two spatial levels:
 
@@ -20,7 +35,9 @@ one per cell (`line_x.count == nx`, etc.), in metres—not `nx+1` cell boundarie
 
 | Attribute | Type | Meaning |
 |---|---|---|
-| `format_version` | int32 | `4` |
+| `format_version` | int32 | `5` |
+| `sample_precision` | string | `int8`, `int12`, `float16` or `float32` |
+| `channels` | string | `components` or `energy` |
 | `simulation_name` | string | Simulation identity |
 | `excited_port` | int32 | Driven port index |
 | `nx`, `ny`, `nz` | int32 | Full-resolution dimensions |
@@ -45,7 +62,7 @@ frame, float32 values, and Blosc2 bitshuffle + LZ4 compression.
 | Dataset | Filtering |
 |---|---|
 | `/preview/energy_max` | Maximum `eps0*|E|² + mu0*|H|²` in the represented block |
-| `/preview/Ex_mean` … `/preview/Hz_mean` | Arithmetic mean of the signed component in the block |
+| `/preview/Ex_mean` … `/preview/Hz_mean` | Arithmetic mean of the signed component in the block (`components` only) |
 
 The normal viewer reads only these datasets. For the reported 146-million-cell mesh, the reduction
 is about 512:1 before compression.
@@ -65,17 +82,21 @@ then decodes preview-cell detail blocks in list order until its deadline.
 
 ## Full-resolution and metadata datasets
 
-`/frames/Ex_xor` through `/frames/Hz_xor` have HDF5 shape `(N,nz,ny,nx)`, uint32 values, and chunks
-`(1,min(nz,2),min(ny,16),min(nx,16))`. Reversing the spatial dimension order makes X the actual
+`/frames/Ex_xor` through `/frames/Hz_xor` (`float32 components`), `/frames/Ex_q` through
+`/frames/Hz_q` (quantized components), `/frames/energy_xor` or `/frames/energy_q` (energy) have HDF5
+shape `(N,nz,ny,nx)` and chunks `(1,min(nz,2),min(ny,16),min(nx,16))`. Quantized values use the
+element types described under Storage options; the rest of this paragraph describes `float32`, whose
+values are uint32. Reversing the spatial dimension order makes X the actual
 contiguous/fastest coordinate in HDF5, rather than merely claiming it in the API. They are detail
 tiles; ordinary playback does not read them. Each value is
-`bitPattern(fullResolutionFloat) XOR bitPattern(previewComponentMean)`. XOR is used instead of
+`bitPattern(fullResolutionFloat) XOR bitPattern(previewComponentMean)` (the preview `energy_max`
+for the energy channel). XOR is used instead of
 floating-point subtraction so reconstruction is bit exact, including low mantissa bits, signed zero,
 infinities, and NaNs. The shared preview baseline also tends to turn common high bits into zeros for
 the compressor.
 
-The small datasets `timestep`, `time_seconds`, `min_energy`, `max_energy`, and signed min/max values
-for each component have one entry per frame. The scalar `published_frame_count` is the authoritative
+The small datasets `timestep`, `time_seconds`, `min_energy`, `max_energy`, and (`components` only)
+signed min/max values for each component have one entry per frame. The scalar `published_frame_count` is the authoritative
 SWMR boundary.
 
 ## Streaming and memory bounds

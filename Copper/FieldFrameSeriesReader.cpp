@@ -13,14 +13,12 @@
 
 #include "Internal/CopperFieldFrameSignposts.hpp"
 #include "Internal/CopperHDF5Blosc2.hpp"
+#include "Internal/FieldFrameSampleCodec.hpp"
 
 namespace copper {
 
 namespace {
 
-constexpr std::array<const char*, 6> kComponentNames = {
-    "/frames/Ex_xor", "/frames/Ey_xor", "/frames/Ez_xor",
-    "/frames/Hx_xor", "/frames/Hy_xor", "/frames/Hz_xor"};
 constexpr std::array<const char*, 6> kComponentMinNames = {
     "/frames/Ex_min", "/frames/Ey_min", "/frames/Ez_min",
     "/frames/Hx_min", "/frames/Hy_min", "/frames/Hz_min"};
@@ -186,7 +184,11 @@ std::expected<std::vector<T>, std::string> readSmallArrayDataset(hid_t file, con
 
 struct FieldFrameSeriesReader::Impl {
     HId file;
-    std::array<HId, 6> component; // Ex,Ey,Ez,Hx,Hy,Hz, opened once and kept for the reader's lifetime
+    // Full-resolution datasets, opened once and kept for the reader's lifetime: Ex,Ey,Ez,Hx,Hy,Hz,
+    // or the single energy channel (see header.storage). The component previews and ranges below
+    // exist only for a components series.
+    std::vector<HId> detail;
+    std::vector<std::string> detailNames;
     HId previewEnergy;
     std::array<HId, 6> previewComponent;
     HId refinementOrder;
@@ -217,26 +219,45 @@ struct FieldFrameSeriesReader::Impl {
     // decode into local storage without holding this lock, so a cached foreground read remains
     // available throughout that work.
     mutable std::mutex mutex;
+
+    bool storesComponents() const { return header.storage.channels == FieldChannels::Components; }
+    bool isSignedDetail() const { return storesComponents(); }
+
+    /// Each detail channel's normalizing scale in `frameIndex` (see field_codec::encode()). Caller
+    /// holds `mutex`; the frame must be published.
+    std::vector<float> detailScalesLocked(std::uint32_t frameIndex) const {
+        std::vector<float> scales;
+        if (storesComponents()) {
+            for (std::size_t c = 0; c < 6; ++c) {
+                scales.push_back(field_codec::componentScale(componentMin[c].at(frameIndex),
+                                                             componentMax[c].at(frameIndex)));
+            }
+        } else {
+            const float peak = maxEnergy.at(frameIndex);
+            scales.push_back(std::isfinite(peak) ? peak : 0.0F);
+        }
+        return scales;
+    }
+
     std::expected<void, std::string> loadPublishedMetadata(std::uint32_t newFrameCount) {
         if (newFrameCount < frameCount) {
             return std::unexpected("Field-frame published count moved backwards");
         }
-        for (std::size_t index = 0; index < component.size(); ++index) {
-            if (H5Drefresh(component[index].get()) < 0) {
-                return std::unexpected(std::string("H5Drefresh failed for ") + kComponentNames[index]);
+        for (std::size_t index = 0; index < detail.size(); ++index) {
+            if (H5Drefresh(detail[index].get()) < 0) {
+                return std::unexpected("H5Drefresh failed for " + detailNames[index]);
             }
-            HId space(H5Dget_space(component[index].get()), H5Sclose);
+            HId space(H5Dget_space(detail[index].get()), H5Sclose);
             hsize_t dims[4] = {0, 0, 0, 0};
             if (!space.valid() || H5Sget_simple_extent_dims(space.get(), dims, nullptr) < 0 ||
                 dims[0] < newFrameCount) {
-                return std::unexpected(std::string("Published extent is unavailable for ") +
-                                       kComponentNames[index]);
+                return std::unexpected("Published extent is unavailable for " + detailNames[index]);
             }
         }
         if (H5Drefresh(previewEnergy.get()) < 0) {
             return std::unexpected("H5Drefresh failed for /preview/energy_max");
         }
-        for (std::size_t index = 0; index < previewComponent.size(); ++index) {
+        for (std::size_t index = 0; storesComponents() && index < previewComponent.size(); ++index) {
             if (H5Drefresh(previewComponent[index].get()) < 0) {
                 return std::unexpected(std::string("H5Drefresh failed for ") + kPreviewComponentNames[index]);
             }
@@ -262,7 +283,7 @@ struct FieldFrameSeriesReader::Impl {
         std::array<std::vector<float>, 6> newComponentMin;
         std::array<std::vector<float>, 6> newComponentMax;
         std::array<std::optional<FieldComponentRange>, 6> newSeriesRanges;
-        for (std::size_t index = 0; index < component.size(); ++index) {
+        for (std::size_t index = 0; storesComponents() && index < newComponentMin.size(); ++index) {
             auto minima = readSmallArrayDataset<float>(file.get(), kComponentMinNames[index],
                                                        H5T_NATIVE_FLOAT, newFrameCount);
             auto maxima = readSmallArrayDataset<float>(file.get(), kComponentMaxNames[index],
@@ -306,38 +327,41 @@ struct FieldFrameSeriesReader::Impl {
         return frameCount;
     }
 
-    /// Reads one frame's hyperslab from each component dataset. HDF5 still decompresses the
-    /// containing on-disk chunk internally, but only this frame is copied into caller-owned memory;
-    /// retaining an entire multi-frame chunk here was the source of multi-gigabyte viewer RSS.
-    std::expected<void, std::string> decodeFrame(std::uint32_t frameIndex,
-                                                  std::uint32_t availableFrameCount,
-                                                  std::array<std::vector<float>, 6>& outComponents) const {
-        std::lock_guard hdf5Lock(hdf5ApiMutex());
-        const std::size_t cellCount = static_cast<std::size_t>(header.nx) * header.ny * header.nz;
-        if (frameIndex >= availableFrameCount) {
-            return std::unexpected("Field frame is outside the published range");
+    /// Decodes a full-resolution cuboid of all six components from frame `frameIndex`. Only the
+    /// requested hyperslab is copied into caller-owned memory, however many frames HDF5's chunks
+    /// span. HDF5 access is serialized by the caller as it requires.
+    std::expected<void, std::string> decodeComponentRegion(
+        std::uint32_t frameIndex, std::uint32_t x, std::uint32_t y, std::uint32_t z, std::uint32_t nx,
+        std::uint32_t ny, std::uint32_t nz, const std::array<std::vector<float>*, 6>& outputs) const {
+        if (!storesComponents()) {
+            return std::unexpected("This field series stores only energy, not E/H components");
         }
-        const os_signpost_id_t signpost = os_signpost_id_generate(fieldFrameSignpostLog());
-        os_signpost_interval_begin(fieldFrameSignpostLog(), signpost, "Decode field frame",
-                                   "frame=%u", frameIndex);
-        const auto finishSignpost = [&](bool success) {
-            os_signpost_interval_end(fieldFrameSignpostLog(), signpost, "Decode field frame",
-                                     "frame=%u success=%d", frameIndex, success ? 1 : 0);
-        };
-        const hsize_t start4[4] = {frameIndex, 0, 0, 0};
-        const hsize_t count4[4] = {1, header.nz, header.ny, header.nx};
-        HId memspace(H5Screate_simple(4, count4, nullptr), H5Sclose);
-        if (!memspace.valid()) {
-            finishSignpost(false);
-            return std::unexpected("H5Screate_simple failed while reading a field frame");
+        std::vector<float> scales;
+        {
+            std::lock_guard lock(mutex);
+            if (frameIndex >= frameCount) return std::unexpected("Field frame is outside the published range");
+            scales = detailScalesLocked(frameIndex);
         }
-        const std::size_t previewCellCount =
-            static_cast<std::size_t>(previewHeader.nx) * previewHeader.ny * previewHeader.nz;
-        const hsize_t previewStart[4] = {frameIndex, 0, 0, 0};
-        const hsize_t previewCount[4] = {1, previewHeader.nz, previewHeader.ny, previewHeader.nx};
+        const FieldSamplePrecision precision = header.storage.precision;
+        const std::size_t bytesPerSample = field_codec::sampleBytes(precision);
+        const hid_t storedType = field_codec::nativeType(precision, true);
+        const std::size_t cellCount = static_cast<std::size_t>(nx) * ny * nz;
+        const hsize_t start[4] = {frameIndex, z, y, x};
+        const hsize_t count[4] = {1, nz, ny, nx};
+        HId memspace(H5Screate_simple(4, count, nullptr), H5Sclose);
+        if (!memspace.valid()) return std::unexpected("Could not create field detail memory space");
+        const std::uint32_t previewX = x / previewFactorX;
+        const std::uint32_t previewY = y / previewFactorY;
+        const std::uint32_t previewZ = z / previewFactorZ;
+        const std::uint32_t previewNx = (x + nx - 1) / previewFactorX - previewX + 1;
+        const std::uint32_t previewNy = (y + ny - 1) / previewFactorY - previewY + 1;
+        const std::uint32_t previewNz = (z + nz - 1) / previewFactorZ - previewZ + 1;
+        const std::size_t previewCellCount = static_cast<std::size_t>(previewNx) * previewNy * previewNz;
+        const hsize_t previewStart[4] = {frameIndex, previewZ, previewY, previewX};
+        const hsize_t previewCount[4] = {1, previewNz, previewNy, previewNx};
         HId previewMemspace(H5Screate_simple(4, previewCount, nullptr), H5Sclose);
-        std::vector<std::uint32_t> residual(cellCount);
-        for (std::size_t i = 0; i < outComponents.size(); ++i) {
+        std::vector<std::uint8_t> stored(cellCount * bytesPerSample);
+        for (std::size_t i = 0; i < outputs.size(); ++i) {
             std::vector<float> baseline(previewCellCount);
             HId previewFilespace(H5Dget_space(previewComponent[i].get()), H5Sclose);
             if (!previewMemspace.valid() || !previewFilespace.valid() ||
@@ -345,37 +369,51 @@ struct FieldFrameSeriesReader::Impl {
                                     previewCount, nullptr) < 0 ||
                 H5Dread(previewComponent[i].get(), H5T_NATIVE_FLOAT, previewMemspace.get(),
                         previewFilespace.get(), H5P_DEFAULT, baseline.data()) < 0) {
-                finishSignpost(false);
-                return std::unexpected("H5Dread failed while reading a field-detail baseline");
+                return std::unexpected("Could not read field detail baseline");
             }
-            outComponents[i].resize(cellCount);
-            HId filespace(H5Dget_space(component[i].get()), H5Sclose);
+            outputs[i]->resize(cellCount);
+            HId filespace(H5Dget_space(detail[i].get()), H5Sclose);
             if (!filespace.valid() ||
-                H5Sselect_hyperslab(filespace.get(), H5S_SELECT_SET, start4, nullptr, count4, nullptr) < 0) {
-                finishSignpost(false);
-                return std::unexpected("H5Sselect_hyperslab failed while reading a field frame");
+                H5Sselect_hyperslab(filespace.get(), H5S_SELECT_SET, start, nullptr, count, nullptr) < 0 ||
+                H5Dread(detail[i].get(), storedType, memspace.get(), filespace.get(), H5P_DEFAULT,
+                        stored.data()) < 0) {
+                return std::unexpected("Could not read field detail region from " + detailNames[i]);
             }
-            if (H5Dread(component[i].get(), H5T_NATIVE_UINT32, memspace.get(), filespace.get(), H5P_DEFAULT,
-                        residual.data()) < 0) {
-                finishSignpost(false);
-                return std::unexpected("H5Dread failed while reading a field frame");
-            }
-            for (std::uint32_t z = 0; z < header.nz; ++z) {
-                for (std::uint32_t y = 0; y < header.ny; ++y) {
-                    for (std::uint32_t x = 0; x < header.nx; ++x) {
-                        const std::size_t fullIndex = x + static_cast<std::size_t>(header.nx) *
-                            (y + static_cast<std::size_t>(header.ny) * z);
-                        const std::size_t previewIndex = (x / previewFactorX) +
-                            static_cast<std::size_t>(previewHeader.nx) * ((y / previewFactorY) +
-                            static_cast<std::size_t>(previewHeader.ny) * (z / previewFactorZ));
-                        outComponents[i][fullIndex] = std::bit_cast<float>(
-                            residual[fullIndex] ^ std::bit_cast<std::uint32_t>(baseline[previewIndex]));
+            for (std::uint32_t localZ = 0; localZ < nz; ++localZ) {
+                for (std::uint32_t localY = 0; localY < ny; ++localY) {
+                    for (std::uint32_t localX = 0; localX < nx; ++localX) {
+                        const std::size_t localIndex = localX + static_cast<std::size_t>(nx) *
+                            (localY + static_cast<std::size_t>(ny) * localZ);
+                        const std::size_t previewIndex = ((x + localX) / previewFactorX - previewX) +
+                            static_cast<std::size_t>(previewNx) *
+                            (((y + localY) / previewFactorY - previewY) + static_cast<std::size_t>(previewNy) *
+                             ((z + localZ) / previewFactorZ - previewZ));
+                        (*outputs[i])[localIndex] = field_codec::decode(
+                            precision, true, stored.data() + localIndex * bytesPerSample,
+                            baseline[previewIndex], scales[i]);
                     }
                 }
             }
         }
-        finishSignpost(true);
         return {};
+    }
+
+    std::expected<void, std::string> decodeFrame(std::uint32_t frameIndex,
+                                                  std::uint32_t availableFrameCount,
+                                                  std::array<std::vector<float>, 6>& outComponents) const {
+        std::lock_guard hdf5Lock(hdf5ApiMutex());
+        if (frameIndex >= availableFrameCount) {
+            return std::unexpected("Field frame is outside the published range");
+        }
+        const os_signpost_id_t signpost = os_signpost_id_generate(fieldFrameSignpostLog());
+        os_signpost_interval_begin(fieldFrameSignpostLog(), signpost, "Decode field frame",
+                                   "frame=%u", frameIndex);
+        std::array<std::vector<float>*, 6> outputs;
+        for (std::size_t i = 0; i < outputs.size(); ++i) outputs[i] = &outComponents[i];
+        auto decoded = decodeComponentRegion(frameIndex, 0, 0, 0, header.nx, header.ny, header.nz, outputs);
+        os_signpost_interval_end(fieldFrameSignpostLog(), signpost, "Decode field frame",
+                                 "frame=%u success=%d", frameIndex, decoded ? 1 : 0);
+        return decoded;
     }
 
     std::expected<void, std::string> decodePreviewFrame(
@@ -398,6 +436,10 @@ struct FieldFrameSeriesReader::Impl {
             return std::unexpected("H5Dread failed for /preview/energy_max");
         }
         for (std::size_t i = 0; i < outputs.size(); ++i) {
+            if (!storesComponents()) {
+                outputs[i]->clear();
+                continue;
+            }
             outputs[i]->resize(count);
             if (!read(previewComponent[i].get(), outputs[i]->data())) {
                 return std::unexpected(std::string("H5Dread failed for ") + kPreviewComponentNames[i]);
@@ -432,9 +474,24 @@ std::expected<FieldFrameSeriesReader, std::string> FieldFrameSeriesReader::open(
 
     auto formatVersion = readInt32Attribute(file, "format_version");
     if (!formatVersion) return std::unexpected(formatVersion.error());
-    if (*formatVersion != 4) {
-        return std::unexpected("Obsolete field frame-series format_version " + std::to_string(*formatVersion) +
-                               "; rerun the simulation to create format version 4");
+    if (*formatVersion != 4 && *formatVersion != 5) {
+        return std::unexpected("Unsupported field frame-series format_version " + std::to_string(*formatVersion) +
+                               "; rerun the simulation to create format version 5");
+    }
+    // Version 4 had no storage options: lossless float32 components, the default.
+    if (*formatVersion >= 5) {
+        auto precision = readStringAttribute(file, "sample_precision");
+        auto channels = readStringAttribute(file, "channels");
+        if (!precision) return std::unexpected(precision.error());
+        if (!channels) return std::unexpected(channels.error());
+        if (!field_codec::precisionFromName(*precision, impl->header.storage.precision)) {
+            return std::unexpected("Unknown field sample precision \"" + *precision + "\"");
+        }
+        if (*channels == field_codec::channelsName(FieldChannels::Energy)) {
+            impl->header.storage.channels = FieldChannels::Energy;
+        } else if (*channels != field_codec::channelsName(FieldChannels::Components)) {
+            return std::unexpected("Unknown field channels \"" + *channels + "\"");
+        }
     }
     auto simulationName = readStringAttribute(file, "simulation_name");
     if (!simulationName) return std::unexpected(simulationName.error());
@@ -529,32 +586,36 @@ std::expected<FieldFrameSeriesReader, std::string> FieldFrameSeriesReader::open(
         H5Pset_chunk_cache(componentDatasetAccess.get(), 1, 1, 0.0) < 0) {
         return std::unexpected("Could not disable the field component chunk cache");
     }
-    for (std::size_t i = 0; i < kComponentNames.size(); ++i) {
-        HId dataset(H5Dopen2(file, kComponentNames[i], componentDatasetAccess.get()), H5Dclose);
+    const bool storesComponents = impl->storesComponents();
+    if (storesComponents) {
+        for (const char* component : field_codec::kComponentNames) {
+            impl->detailNames.push_back(field_codec::datasetName(impl->header.storage.precision, component));
+        }
+    } else {
+        impl->detailNames.push_back(field_codec::datasetName(impl->header.storage.precision, "energy"));
+    }
+    for (std::size_t i = 0; i < impl->detailNames.size(); ++i) {
+        HId dataset(H5Dopen2(file, impl->detailNames[i].c_str(), componentDatasetAccess.get()), H5Dclose);
         if (!dataset.valid()) {
-            return std::unexpected(std::string("H5Dopen2 failed for ") + kComponentNames[i]);
+            return std::unexpected("H5Dopen2 failed for " + impl->detailNames[i]);
         }
         if (i == 0) {
-            // The scalar publication dataset above is authoritative. Ex's current physical extent
-            // may already include a block the writer has not published yet.
+            // The scalar publication dataset above is authoritative. The first channel's current
+            // physical extent may already include a block the writer has not published yet.
             HId space(H5Dget_space(dataset.get()), H5Sclose);
-            if (!space.valid()) {
-                return std::unexpected("H5Dget_space failed for /frames/Ex");
-            }
             hsize_t dims[4] = {0, 0, 0, 0};
-            if (H5Sget_simple_extent_dims(space.get(), dims, nullptr) < 0) {
-                return std::unexpected("H5Sget_simple_extent_dims failed for /frames/Ex");
+            if (!space.valid() || H5Sget_simple_extent_dims(space.get(), dims, nullptr) < 0) {
+                return std::unexpected("Could not read the extent of " + impl->detailNames[i]);
             }
             if (dims[0] < impl->frameCount) {
-                return std::unexpected("Published field-frame count exceeds /frames/Ex's extent");
+                return std::unexpected("Published field-frame count exceeds " + impl->detailNames[i] + "'s extent");
             }
-
         }
-        impl->component[i] = std::move(dataset);
+        impl->detail.push_back(std::move(dataset));
     }
     impl->previewEnergy = HId(H5Dopen2(file, "/preview/energy_max", componentDatasetAccess.get()), H5Dclose);
     if (!impl->previewEnergy.valid()) return std::unexpected("H5Dopen2 failed for /preview/energy_max");
-    for (std::size_t i = 0; i < kPreviewComponentNames.size(); ++i) {
+    for (std::size_t i = 0; storesComponents && i < kPreviewComponentNames.size(); ++i) {
         impl->previewComponent[i] =
             HId(H5Dopen2(file, kPreviewComponentNames[i], componentDatasetAccess.get()), H5Dclose);
         if (!impl->previewComponent[i].valid()) {
@@ -580,7 +641,7 @@ std::expected<FieldFrameSeriesReader, std::string> FieldFrameSeriesReader::open(
     impl->minEnergy = std::move(*minEnergyValues);
     impl->maxEnergy = std::move(*maxEnergyValues);
 
-    for (std::size_t component = 0; component < impl->component.size(); ++component) {
+    for (std::size_t component = 0; storesComponents && component < impl->componentMin.size(); ++component) {
         auto minima = readSmallArrayDataset<float>(file, kComponentMinNames[component], H5T_NATIVE_FLOAT,
                                                    impl->frameCount);
         if (!minima) return std::unexpected(minima.error());
@@ -759,8 +820,8 @@ FieldFrameSeriesReader::readPreviewCellDetails(
         if (cell >= previewCellCount) return std::unexpected("Preview-cell detail index is outside the grid");
     }
 
-    // Ensure the small signed preview is resident. Besides making ordinary playback cheap, this
-    // supplies the exact XOR baseline for reconstruction without asking HDF5 to decompress the
+    // Ensure the small preview is resident. Besides making ordinary playback cheap, this supplies
+    // the exact XOR baseline for lossless reconstruction without asking HDF5 to decompress the
     // whole preview chunk again for every tile batch.
     bool previewIsCached = false;
     {
@@ -773,23 +834,30 @@ FieldFrameSeriesReader::readPreviewCellDetails(
         if (!preview) return std::unexpected(preview.error());
     }
 
+    const bool storesComponents = impl.storesComponents();
+    const std::size_t channelCount = impl.detail.size();
+    const FieldSamplePrecision precision = impl.header.storage.precision;
+    const std::size_t bytesPerSample = field_codec::sampleBytes(precision);
     struct RawTile {
-        std::array<std::vector<std::uint8_t>, 6> payloads;
-        std::array<std::uint32_t, 6> filterMasks{};
+        std::vector<std::vector<std::uint8_t>> payloads;
+        std::vector<std::uint32_t> filterMasks;
     };
     std::vector<RawTile> raw(previewCellIndices.size());
     std::vector<FieldPreviewCellDetail> details(previewCellIndices.size());
-    std::vector<std::array<float, 6>> baselines(previewCellIndices.size());
+    std::vector<std::vector<float>> baselines(previewCellIndices.size());
+    std::vector<float> scales;
 
     {
         std::lock_guard lock(impl.mutex);
         if (impl.cachedPreviewFrameIndex != frameIndex) {
             return std::unexpected("Preview cache changed while preparing field-detail batch");
         }
+        scales = impl.detailScalesLocked(frameIndex);
         for (std::size_t tileIndex = 0; tileIndex < previewCellIndices.size(); ++tileIndex) {
             const std::uint32_t cell = previewCellIndices[tileIndex];
-            for (std::size_t component = 0; component < 6; ++component) {
-                baselines[tileIndex][component] = impl.cachedPreviewComponents[component][cell];
+            for (std::size_t channel = 0; channel < channelCount; ++channel) {
+                baselines[tileIndex].push_back(storesComponents ? impl.cachedPreviewComponents[channel][cell]
+                                                                : impl.cachedPreviewEnergy[cell]);
             }
         }
     }
@@ -812,31 +880,30 @@ FieldFrameSeriesReader::readPreviewCellDetails(
             details[tileIndex].ny = std::min(impl.previewFactorY, impl.header.ny - y);
             details[tileIndex].nz = std::min(impl.previewFactorZ, impl.header.nz - z);
             const hsize_t offset[4] = {frameIndex, z, y, x};
-            for (std::size_t component = 0; component < 6; ++component) {
+            raw[tileIndex].payloads.resize(channelCount);
+            raw[tileIndex].filterMasks.assign(channelCount, 0);
+            for (std::size_t channel = 0; channel < channelCount; ++channel) {
+                const hid_t dataset = impl.detail[channel].get();
                 hsize_t storedBytes = 0;
-                if (H5Dget_chunk_storage_size(impl.component[component].get(), offset, &storedBytes) < 0 ||
-                    storedBytes == 0) {
-                    return std::unexpected(std::string("Could not size raw field-detail chunk from ") +
-                                           kComponentNames[component]);
+                if (H5Dget_chunk_storage_size(dataset, offset, &storedBytes) < 0 || storedBytes == 0) {
+                    return std::unexpected("Could not size raw field-detail chunk from " + impl.detailNames[channel]);
                 }
-                auto& payload = raw[tileIndex].payloads[component];
+                auto& payload = raw[tileIndex].payloads[channel];
                 payload.resize(static_cast<std::size_t>(storedBytes));
 #if H5Dread_chunk_vers >= 2
                 // HDF5 2.x takes the caller's buffer size and returns the number of bytes read.
                 std::size_t readBytes = payload.size();
-                if (H5Dread_chunk(impl.component[component].get(), H5P_DEFAULT, offset,
-                                  &raw[tileIndex].filterMasks[component], payload.data(), &readBytes) < 0) {
-                    return std::unexpected(std::string("Could not read raw field-detail chunk from ") +
-                                           kComponentNames[component]);
+                if (H5Dread_chunk(dataset, H5P_DEFAULT, offset, &raw[tileIndex].filterMasks[channel],
+                                  payload.data(), &readBytes) < 0) {
+                    return std::unexpected("Could not read raw field-detail chunk from " + impl.detailNames[channel]);
                 }
                 payload.resize(readBytes);
 #else
                 // HDF5 1.x has no buffer-size parameter.  The allocation above is sized using
                 // H5Dget_chunk_storage_size(), which is the documented compatibility path.
-                if (H5Dread_chunk(impl.component[component].get(), H5P_DEFAULT, offset,
-                                  &raw[tileIndex].filterMasks[component], payload.data()) < 0) {
-                    return std::unexpected(std::string("Could not read raw field-detail chunk from ") +
-                                           kComponentNames[component]);
+                if (H5Dread_chunk(dataset, H5P_DEFAULT, offset, &raw[tileIndex].filterMasks[channel],
+                                  payload.data()) < 0) {
+                    return std::unexpected("Could not read raw field-detail chunk from " + impl.detailNames[channel]);
                 }
 #endif
             }
@@ -847,6 +914,11 @@ FieldFrameSeriesReader::readPreviewCellDetails(
     std::atomic<bool> failed{false};
     std::mutex errorMutex;
     std::string error;
+    const auto fail = [&](const char* message) {
+        failed.store(true, std::memory_order_relaxed);
+        std::lock_guard lock(errorMutex);
+        error = message;
+    };
     const unsigned int workerCount = std::min<unsigned int>(
         static_cast<unsigned int>(previewCellIndices.size()),
         std::max(1U, std::thread::hardware_concurrency()));
@@ -858,47 +930,42 @@ FieldFrameSeriesReader::readPreviewCellDetails(
             params.nthreads = 1;
             return blosc2_create_dctx(params);
         }();
+        std::vector<std::uint8_t> decoded;
         while (!failed.load(std::memory_order_relaxed)) {
             const std::size_t tileIndex = nextTile.fetch_add(1, std::memory_order_relaxed);
             if (tileIndex >= details.size()) break;
             auto& detail = details[tileIndex];
             const std::size_t actualCount = static_cast<std::size_t>(detail.nx) * detail.ny * detail.nz;
-            for (std::size_t component = 0; component < 6; ++component) {
-                const auto& payload = raw[tileIndex].payloads[component];
-                std::vector<std::uint32_t> decoded;
-                if ((raw[tileIndex].filterMasks[component] & 1U) != 0) {
-                    if (payload.size() % sizeof(std::uint32_t) != 0) {
-                        failed.store(true, std::memory_order_relaxed);
-                        std::lock_guard lock(errorMutex);
-                        error = "Unfiltered field-detail chunk has an invalid byte count";
+            for (std::size_t channel = 0; channel < channelCount && !failed.load(std::memory_order_relaxed);
+                 ++channel) {
+                const auto& payload = raw[tileIndex].payloads[channel];
+                if ((raw[tileIndex].filterMasks[channel] & 1U) != 0) {
+                    if (payload.size() % bytesPerSample != 0) {
+                        fail("Unfiltered field-detail chunk has an invalid byte count");
                         break;
                     }
-                    decoded.resize(payload.size() / sizeof(std::uint32_t));
-                    std::memcpy(decoded.data(), payload.data(), payload.size());
+                    decoded = payload;
                 } else {
                     std::int32_t outputBytes = 0, encodedBytes = 0;
                     if (context == nullptr ||
                         blosc2_cbuffer_sizes(payload.data(), &outputBytes, &encodedBytes, nullptr) < 0 ||
-                        outputBytes <= 0 || static_cast<std::size_t>(outputBytes) % sizeof(std::uint32_t) != 0) {
-                        failed.store(true, std::memory_order_relaxed);
-                        std::lock_guard lock(errorMutex);
-                        error = "Could not inspect compressed field-detail chunk";
+                        outputBytes <= 0 || static_cast<std::size_t>(outputBytes) % bytesPerSample != 0) {
+                        fail("Could not inspect compressed field-detail chunk");
                         break;
                     }
-                    decoded.resize(static_cast<std::size_t>(outputBytes) / sizeof(std::uint32_t));
+                    decoded.resize(static_cast<std::size_t>(outputBytes));
                     const int result = blosc2_decompress_ctx(context, payload.data(), encodedBytes,
                                                              decoded.data(), outputBytes);
                     if (result != outputBytes) {
-                        failed.store(true, std::memory_order_relaxed);
-                        std::lock_guard lock(errorMutex);
-                        error = "Could not decompress field-detail chunk";
+                        fail("Could not decompress field-detail chunk");
                         break;
                     }
                 }
-                const bool compactEdge = decoded.size() == actualCount;
+                const std::size_t decodedCount = decoded.size() / bytesPerSample;
+                const bool compactEdge = decodedCount == actualCount;
                 const std::uint32_t strideX = compactEdge ? detail.nx : impl.previewFactorX;
                 const std::uint32_t strideY = compactEdge ? detail.ny : impl.previewFactorY;
-                auto& output = detail.components[component];
+                auto& output = storesComponents ? detail.components[channel] : detail.energy;
                 output.resize(actualCount);
                 for (std::uint32_t z = 0; z < detail.nz; ++z) {
                     for (std::uint32_t y = 0; y < detail.ny; ++y) {
@@ -907,14 +974,13 @@ FieldFrameSeriesReader::readPreviewCellDetails(
                                 (y + static_cast<std::size_t>(detail.ny) * z);
                             const std::size_t source = x + static_cast<std::size_t>(strideX) *
                                 (y + static_cast<std::size_t>(strideY) * z);
-                            if (source >= decoded.size()) {
-                                failed.store(true, std::memory_order_relaxed);
-                                std::lock_guard lock(errorMutex);
-                                error = "Decoded field-detail chunk has unexpected dimensions";
+                            if (source >= decodedCount) {
+                                fail("Decoded field-detail chunk has unexpected dimensions");
                                 break;
                             }
-                            output[destination] = std::bit_cast<float>(decoded[source] ^
-                                std::bit_cast<std::uint32_t>(baselines[tileIndex][component]));
+                            output[destination] = field_codec::decode(
+                                precision, storesComponents, decoded.data() + source * bytesPerSample,
+                                baselines[tileIndex][channel], scales[channel]);
                         }
                     }
                 }
@@ -943,61 +1009,8 @@ std::expected<void, std::string> FieldFrameSeriesReader::readRegion(
         nx > impl.header.nx - x || ny > impl.header.ny - y || nz > impl.header.nz - z) {
         return std::unexpected("Field detail region is empty or outside the grid");
     }
-    const std::size_t cellCount = static_cast<std::size_t>(nx) * ny * nz;
-    const hsize_t start[4] = {frameIndex, z, y, x};
-    const hsize_t count[4] = {1, nz, ny, nx};
-    HId memspace(H5Screate_simple(4, count, nullptr), H5Sclose);
-    if (!memspace.valid()) return std::unexpected("Could not create field detail memory space");
     std::array<std::vector<float>*, 6> outputs = {&ex, &ey, &ez, &hx, &hy, &hz};
-    const std::uint32_t previewX = x / impl.previewFactorX;
-    const std::uint32_t previewY = y / impl.previewFactorY;
-    const std::uint32_t previewZ = z / impl.previewFactorZ;
-    const std::uint32_t previewNx = (x + nx - 1) / impl.previewFactorX - previewX + 1;
-    const std::uint32_t previewNy = (y + ny - 1) / impl.previewFactorY - previewY + 1;
-    const std::uint32_t previewNz = (z + nz - 1) / impl.previewFactorZ - previewZ + 1;
-    const std::size_t previewCellCount =
-        static_cast<std::size_t>(previewNx) * previewNy * previewNz;
-    const hsize_t previewStart[4] = {frameIndex, previewZ, previewY, previewX};
-    const hsize_t previewCount[4] = {1, previewNz, previewNy, previewNx};
-    HId previewMemspace(H5Screate_simple(4, previewCount, nullptr), H5Sclose);
-    std::vector<std::uint32_t> residual(cellCount);
-    for (std::size_t i = 0; i < outputs.size(); ++i) {
-        std::vector<float> baseline(previewCellCount);
-        HId previewFilespace(H5Dget_space(impl.previewComponent[i].get()), H5Sclose);
-        if (!previewMemspace.valid() || !previewFilespace.valid() ||
-            H5Sselect_hyperslab(previewFilespace.get(), H5S_SELECT_SET, previewStart, nullptr,
-                                previewCount, nullptr) < 0 ||
-            H5Dread(impl.previewComponent[i].get(), H5T_NATIVE_FLOAT, previewMemspace.get(),
-                    previewFilespace.get(), H5P_DEFAULT, baseline.data()) < 0) {
-            return std::unexpected("Could not read field detail baseline");
-        }
-        outputs[i]->resize(cellCount);
-        HId filespace(H5Dget_space(impl.component[i].get()), H5Sclose);
-        if (!filespace.valid() ||
-            H5Sselect_hyperslab(filespace.get(), H5S_SELECT_SET, start, nullptr, count, nullptr) < 0 ||
-            H5Dread(impl.component[i].get(), H5T_NATIVE_UINT32, memspace.get(), filespace.get(),
-                    H5P_DEFAULT, residual.data()) < 0) {
-            return std::unexpected(std::string("Could not read field detail region from ") + kComponentNames[i]);
-        }
-        for (std::uint32_t localZ = 0; localZ < nz; ++localZ) {
-            for (std::uint32_t localY = 0; localY < ny; ++localY) {
-                for (std::uint32_t localX = 0; localX < nx; ++localX) {
-                    const std::uint32_t globalX = x + localX;
-                    const std::uint32_t globalY = y + localY;
-                    const std::uint32_t globalZ = z + localZ;
-                    const std::size_t localIndex = localX + static_cast<std::size_t>(nx) *
-                        (localY + static_cast<std::size_t>(ny) * localZ);
-                    const std::size_t previewIndex = (globalX / impl.previewFactorX - previewX) +
-                        static_cast<std::size_t>(previewNx) *
-                        ((globalY / impl.previewFactorY - previewY) + static_cast<std::size_t>(previewNy) *
-                         (globalZ / impl.previewFactorZ - previewZ));
-                    (*outputs[i])[localIndex] = std::bit_cast<float>(
-                        residual[localIndex] ^ std::bit_cast<std::uint32_t>(baseline[previewIndex]));
-                }
-            }
-        }
-    }
-    return {};
+    return impl.decodeComponentRegion(frameIndex, x, y, z, nx, ny, nz, outputs);
 }
 
 void FieldFrameSeriesReader::prefetchFrame(std::uint32_t index) const {
@@ -1078,6 +1091,7 @@ float FieldFrameSeriesReader::maxEnergy(std::uint32_t index) const {
 FieldComponentRange FieldFrameSeriesReader::componentRange(FieldComponent component, std::uint32_t index) const {
     std::lock_guard lock(_impl->mutex);
     const std::size_t componentIndex = static_cast<std::size_t>(component);
+    if (!_impl->storesComponents()) return {};
     return {_impl->componentMin.at(componentIndex).at(index), _impl->componentMax.at(componentIndex).at(index)};
 }
 

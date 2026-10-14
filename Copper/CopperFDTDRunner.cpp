@@ -366,6 +366,7 @@ CopperFDTDRunResult runFDTDPortImpl(ContinuousStructure& csx, const CopperFDTDPo
             header.lineY.assign(grid.lineY.begin(), grid.lineY.end());
             header.lineZ.assign(grid.lineZ.begin(), grid.lineZ.end());
             header.domainXYClass = domainMask.xyClass;
+            header.storage = fieldFrameSeries->storage;
             errno = 0;
             auto writer = FieldFrameSeriesWriter::create(fieldFrameSeries->path, header, fieldFrameSeries->chunkFrames);
             const int writerCreationErrno = errno;
@@ -388,6 +389,10 @@ CopperFDTDRunResult runFDTDPortImpl(ContinuousStructure& csx, const CopperFDTDPo
             }
         }
 
+        // The caller's own interval when frames are persisted; otherwise the original in-memory
+        // cadence, which also waits for the >4s progress tick (see the capture call below).
+        const std::uint32_t captureIntervalSteps =
+            fieldFrameSeries ? std::max<std::uint32_t>(1, fieldFrameSeries->captureIntervalSteps) : 0;
         const std::uint32_t minCaptureStepSpacing = 1000;
         std::uint32_t lastCaptureStep = 0;
         std::uint32_t capturedFrameCount = 0;
@@ -610,17 +615,18 @@ CopperFDTDRunResult runFDTDPortImpl(ContinuousStructure& csx, const CopperFDTDPo
                         endCriteriaReached = true;
                     }
                 }
-                // Periodic capture piggybacks on the same >4s wall-clock check above (so a
-                // field-frame capture never adds its own separate timing pass), and only actually
-                // captures once at least minCaptureStepSpacing steps have passed since the last one
-                // -- bounding the total frame count regardless of how long the run itself takes.
-                // The final step's own state is captured unconditionally, deliberately NOT gated
-                // behind the wall-clock check too -- a run whose last step happens to land <4s after
-                // the previous progress tick (common on a short/fast run) would otherwise silently
-                // drop its own last frame the same way frame 0 used to be dropped (see this
-                // function's own captureFieldFrame(0) call, above the loop).
-                if (globalTimestep == steps ||
-                    (sinceLastPrint > 4.0 && globalTimestep - lastCaptureStep >= minCaptureStepSpacing)) {
+                // A persisted series is captured at exactly the caller's step interval. Without
+                // one, periodic capture piggybacks on the same >4s wall-clock check above (so it
+                // never adds its own timing pass) and waits for at least minCaptureStepSpacing steps,
+                // bounding the in-memory frame count however long the run takes. The final step's
+                // own state is captured unconditionally either way -- a run whose last step lands
+                // <4s after the previous progress tick would otherwise silently drop its own last
+                // frame the same way frame 0 used to be dropped (see this function's own
+                // captureFieldFrame(0) call, above the loop).
+                const bool captureDue = captureIntervalSteps != 0
+                    ? globalTimestep % captureIntervalSteps == 0
+                    : sinceLastPrint > 4.0 && globalTimestep - lastCaptureStep >= minCaptureStepSpacing;
+                if (globalTimestep == steps || captureDue) {
                     captureFieldFrame(globalTimestep);
                 }
                 // Checked every timestep (not gated behind the >4s wall-clock

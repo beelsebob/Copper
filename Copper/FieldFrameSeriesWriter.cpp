@@ -12,6 +12,7 @@
 
 #include "Internal/CopperFieldFrameSignposts.hpp"
 #include "Internal/CopperHDF5Blosc2.hpp"
+#include "Internal/FieldFrameSampleCodec.hpp"
 
 namespace copper {
 
@@ -157,20 +158,22 @@ std::expected<void, std::string> writeUInt8ArrayDataset(hid_t file, const char* 
 } // namespace
 
 /// Every open HDF5 handle this writer holds for the file's lifetime, plus running frame count.
-/// `bigDatasets`/`smallDatasets` are indexed in a fixed order (see the constructor) matching
-/// writeFrame()'s own parameter order, so appendFrame() can loop over them generically.
+/// The component arrays are indexed Ex,Ey,Ez,Hx,Hy,Hz, matching writeFrame()'s own parameter order;
+/// they stay -1 (never created) when the series stores only energy.
 struct FieldFrameSeriesWriter::Impl {
     HId file;
-    std::array<hid_t, 6> component{}; // Ex,Ey,Ez,Hx,Hy,Hz -- owned via `owned`, not closed directly
+    FieldFrameStorage storage;
+    // Full-resolution datasets: the six components, or the one energy channel. Owned via `owned`.
+    std::vector<hid_t> detail;
     hid_t previewEnergy = -1;
-    std::array<hid_t, 6> previewComponent{};
+    std::array<hid_t, 6> previewComponent{-1, -1, -1, -1, -1, -1};
     hid_t refinementOrder = -1;
     hid_t timestepDataset = -1;
     hid_t timeSecondsDataset = -1;
     hid_t minEnergyDataset = -1;
     hid_t maxEnergyDataset = -1;
-    std::array<hid_t, 6> componentMinDataset{};
-    std::array<hid_t, 6> componentMaxDataset{};
+    std::array<hid_t, 6> componentMinDataset{-1, -1, -1, -1, -1, -1};
+    std::array<hid_t, 6> componentMaxDataset{-1, -1, -1, -1, -1, -1};
     hid_t publishedFrameCountDataset = -1;
     std::vector<HId> owned; // keeps every dataset/property-list handle alive for the file's lifetime
     std::uint32_t nx = 0, ny = 0, nz = 0;
@@ -245,9 +248,11 @@ std::expected<FieldFrameSeriesWriter, std::string> FieldFrameSeriesWriter::creat
     // so this is the only way to see the true numbers from a real run's own console output.
     std::fprintf(stdout,
                  "Copper: field frame-series %s: grid=%ux%ux%u, frame=%llu bytes/component, "
-                 "publishFrames=%u, detailTile=16x16x2\n",
+                 "publishFrames=%u, detailTile=16x16x2, storage=%s %s\n",
                  path.string().c_str(), header.nx, header.ny, header.nz,
-                 static_cast<unsigned long long>(frameBytes), chunkFrames);
+                 static_cast<unsigned long long>(frameBytes), chunkFrames,
+                 field_codec::precisionName(header.storage.precision),
+                 field_codec::channelsName(header.storage.channels));
     if (auto registered = registerHDF5Blosc2Filter(); !registered) {
         return std::unexpected(registered.error());
     }
@@ -265,6 +270,8 @@ std::expected<FieldFrameSeriesWriter, std::string> FieldFrameSeriesWriter::creat
         return std::unexpected("Field preview has too many cells for uint32 refinement indices");
     }
     impl->chunkFrames = chunkFrames;
+    impl->storage = header.storage;
+    const bool storesComponents = header.storage.channels == FieldChannels::Components;
 
     HId fileAccess(H5Pcreate(H5P_FILE_ACCESS), H5Pclose);
     if (!fileAccess.valid() ||
@@ -278,7 +285,9 @@ std::expected<FieldFrameSeriesWriter, std::string> FieldFrameSeriesWriter::creat
     const hid_t file = impl->file.get();
 
     // Root attributes.
-    if (auto r = writeScalarAttribute<std::int32_t>(file, "format_version", H5T_NATIVE_INT32, 4); !r) return std::unexpected(r.error());
+    if (auto r = writeScalarAttribute<std::int32_t>(file, "format_version", H5T_NATIVE_INT32, 5); !r) return std::unexpected(r.error());
+    if (auto r = writeStringAttribute(file, "sample_precision", field_codec::precisionName(header.storage.precision)); !r) return std::unexpected(r.error());
+    if (auto r = writeStringAttribute(file, "channels", field_codec::channelsName(header.storage.channels)); !r) return std::unexpected(r.error());
     if (auto r = writeStringAttribute(file, "simulation_name", header.simulationName); !r) return std::unexpected(r.error());
     if (auto r = writeScalarAttribute<std::int32_t>(file, "excited_port", H5T_NATIVE_INT32, header.excitedPort); !r) return std::unexpected(r.error());
     if (auto r = writeScalarAttribute<std::int32_t>(file, "nx", H5T_NATIVE_INT32, static_cast<std::int32_t>(header.nx)); !r) return std::unexpected(r.error());
@@ -324,7 +333,9 @@ std::expected<FieldFrameSeriesWriter, std::string> FieldFrameSeriesWriter::creat
         impl->previewEnergy = *energy;
         static const char* const names[6] = {"/preview/Ex_mean", "/preview/Ey_mean", "/preview/Ez_mean",
                                              "/preview/Hx_mean", "/preview/Hy_mean", "/preview/Hz_mean"};
-        for (std::size_t i = 0; i < 6; ++i) {
+        // Signed means serve only component detail and differential combining, which an
+        // energy-only series can't offer.
+        for (std::size_t i = 0; storesComponents && i < 6; ++i) {
             auto dataset = createExtendibleDataset(file, names[i], 4, dims, maxdims, chunks,
                                                    H5T_NATIVE_FLOAT, true, impl->owned);
             if (!dataset) return std::unexpected(dataset.error());
@@ -344,24 +355,29 @@ std::expected<FieldFrameSeriesWriter, std::string> FieldFrameSeriesWriter::creat
         impl->refinementOrder = *order;
     }
 
-    // /frames group + the six big extendible component datasets, chunked+compressed.
+    // /frames group + the big extendible full-resolution datasets, chunked+compressed: six signed
+    // components, or one unsigned energy channel.
     {
         HId frames(H5Gcreate2(file, "/frames", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose);
         if (!frames.valid()) {
             return std::unexpected("H5Gcreate2 failed for /frames");
         }
-        static const char* const kComponentNames[6] = {"/frames/Ex_xor", "/frames/Ey_xor", "/frames/Ez_xor",
-                                                       "/frames/Hx_xor", "/frames/Hy_xor", "/frames/Hz_xor"};
         const hsize_t dims4[4] = {0, header.nz, header.ny, header.nx};
         const hsize_t maxdims4[4] = {H5S_UNLIMITED, header.nz, header.ny, header.nx};
         const hsize_t chunk4[4] = {1, std::min<hsize_t>(header.nz, impl->previewFactorZ),
                                   std::min<hsize_t>(header.ny, impl->previewFactorY),
                                   std::min<hsize_t>(header.nx, impl->previewFactorX)};
-        for (int i = 0; i < 6; ++i) {
-            auto ds = createExtendibleDataset(file, kComponentNames[i], 4, dims4, maxdims4, chunk4,
-                                              H5T_NATIVE_UINT32, true, impl->owned);
+        const FieldSamplePrecision precision = header.storage.precision;
+        const std::vector<const char*> channelNames = storesComponents
+            ? std::vector<const char*>(field_codec::kComponentNames.begin(), field_codec::kComponentNames.end())
+            : std::vector<const char*>{"energy"};
+        for (const char* channel : channelNames) {
+            const std::string name = field_codec::datasetName(precision, channel);
+            auto ds = createExtendibleDataset(file, name.c_str(), 4, dims4, maxdims4, chunk4,
+                                              field_codec::nativeType(precision, storesComponents), true,
+                                              impl->owned);
             if (!ds) return std::unexpected(ds.error());
-            impl->component[static_cast<std::size_t>(i)] = *ds;
+            impl->detail.push_back(*ds);
         }
 
         // Small per-frame metadata: extendible (a dataset with an unlimited dimension must be
@@ -400,7 +416,7 @@ std::expected<FieldFrameSeriesWriter, std::string> FieldFrameSeriesWriter::creat
         static const char* const kComponentMaxNames[6] = {
             "/frames/Ex_max", "/frames/Ey_max", "/frames/Ez_max",
             "/frames/Hx_max", "/frames/Hy_max", "/frames/Hz_max"};
-        for (std::size_t i = 0; i < impl->component.size(); ++i) {
+        for (std::size_t i = 0; storesComponents && i < impl->componentMinDataset.size(); ++i) {
             auto minDataset = createTyped1D(kComponentMinNames[i], H5T_NATIVE_FLOAT);
             if (!minDataset) return std::unexpected(minDataset.error());
             impl->componentMinDataset[i] = *minDataset;
@@ -566,22 +582,41 @@ std::expected<void, std::string> FieldFrameSeriesWriter::writeFrame(std::uint32_
         }
         return {};
     };
+    const bool storesComponents = impl.storage.channels == FieldChannels::Components;
     if (auto result = appendPreview(impl.previewEnergy, previewEnergy.data()); !result) return result;
-    for (std::size_t i = 0; i < previewComponents.size(); ++i) {
+    for (std::size_t i = 0; storesComponents && i < previewComponents.size(); ++i) {
         if (auto result = appendPreview(impl.previewComponent[i], previewComponents[i].data()); !result) return result;
     }
-    // Lossless detail residuals. Arithmetic float subtraction cannot guarantee bit-exact recovery,
-    // so store originalBits XOR previewMeanBits. Within a coarse block the shared high bits usually
-    // become zero and compress well; decoding is exact and each 16x16x2 preview-cell tile is independent.
+    // Full-resolution detail, one independently compressed 16x16x2 tile per preview cell (see
+    // field_codec::encode()). Float32 is lossless: arithmetic float subtraction can't guarantee
+    // bit-exact recovery, so it stores originalBits XOR previewBits, whose shared high bits usually
+    // become zero and compress well. The other precisions store each value over its channel's peak
+    // magnitude in this frame, which the reader recovers from the per-frame ranges/energy maximum.
+    const FieldSamplePrecision precision = impl.storage.precision;
+    const std::size_t bytesPerSample = field_codec::sampleBytes(precision);
+    const hid_t storedType = field_codec::nativeType(precision, storesComponents);
+    std::vector<float> fullEnergy;
+    if (!storesComponents) {
+        fullEnergy.resize(cellCount);
+        for (std::size_t i = 0; i < cellCount; ++i) {
+            fullEnergy[i] = static_cast<float>(kEps0) * (ex[i] * ex[i] + ey[i] * ey[i] + ez[i] * ez[i]) +
+                            static_cast<float>(kMu0) * (hx[i] * hx[i] + hy[i] * hy[i] + hz[i] * hz[i]);
+        }
+    }
     const hsize_t detailExtent[4] = {frameIndex + 1, impl.nz, impl.ny, impl.nx};
     const std::uint32_t kTileX = impl.previewFactorX;
     const std::uint32_t kTileY = impl.previewFactorY;
     const std::uint32_t kTileZ = impl.previewFactorZ;
-    std::vector<std::uint32_t> residual;
-    residual.reserve(static_cast<std::size_t>(kTileX) * kTileY * kTileZ);
-    for (std::size_t component = 0; component < components.size(); ++component) {
-        const hid_t dataset = impl.component[component];
-        const float componentRange = componentMax[component] - componentMin[component];
+    std::vector<std::uint8_t> tile;
+    tile.reserve(static_cast<std::size_t>(kTileX) * kTileY * kTileZ * bytesPerSample);
+    for (std::size_t channel = 0; channel < impl.detail.size(); ++channel) {
+        const hid_t dataset = impl.detail[channel];
+        const std::vector<float>& values = storesComponents ? *components[channel] : fullEnergy;
+        const std::vector<float>& baselines = storesComponents ? previewComponents[channel] : previewEnergy;
+        const float scale = storesComponents
+            ? field_codec::componentScale(componentMin[channel], componentMax[channel])
+            : (std::isfinite(maxEnergy) ? maxEnergy : 0.0F);
+        const float componentRange = storesComponents ? componentMax[channel] - componentMin[channel] : 0.0F;
         if (H5Dset_extent(dataset, detailExtent) < 0) {
             return std::unexpected("H5Dset_extent failed while appending field detail");
         }
@@ -591,7 +626,8 @@ std::expected<void, std::string> FieldFrameSeriesWriter::writeFrame(std::uint32_
                 const std::uint32_t tileNy = std::min(kTileY, impl.ny - y0);
                 for (std::uint32_t x0 = 0; x0 < impl.nx; x0 += kTileX) {
                     const std::uint32_t tileNx = std::min(kTileX, impl.nx - x0);
-                    residual.clear();
+                    tile.resize(static_cast<std::size_t>(tileNx) * tileNy * tileNz * bytesPerSample);
+                    std::uint8_t* destination = tile.data();
                     for (std::uint32_t z = z0; z < z0 + tileNz; ++z) {
                         for (std::uint32_t y = y0; y < y0 + tileNy; ++y) {
                             for (std::uint32_t x = x0; x < x0 + tileNx; ++x) {
@@ -602,16 +638,16 @@ std::expected<void, std::string> FieldFrameSeriesWriter::writeFrame(std::uint32_
                                     static_cast<std::size_t>(impl.previewNy) * (z / impl.previewFactorZ));
                                 if (componentRange > 0.0F) {
                                     const float normalized =
-                                        std::abs((*components[component])[fullIndex] -
-                                                 previewComponents[component][previewIndex]) / componentRange;
+                                        std::abs(values[fullIndex] - baselines[previewIndex]) / componentRange;
                                     refinementScore[previewIndex] =
                                         std::max(refinementScore[previewIndex],
                                                  std::isfinite(normalized)
                                                      ? normalized
                                                      : std::numeric_limits<float>::infinity());
                                 }
-                                residual.push_back(std::bit_cast<std::uint32_t>((*components[component])[fullIndex]) ^
-                                                   std::bit_cast<std::uint32_t>(previewComponents[component][previewIndex]));
+                                field_codec::encode(precision, storesComponents, values[fullIndex],
+                                                    baselines[previewIndex], scale, destination);
+                                destination += bytesPerSample;
                             }
                         }
                     }
@@ -621,9 +657,9 @@ std::expected<void, std::string> FieldFrameSeriesWriter::writeFrame(std::uint32_
                     HId memspace(H5Screate_simple(4, count, nullptr), H5Sclose);
                     if (!filespace.valid() || !memspace.valid() ||
                         H5Sselect_hyperslab(filespace.get(), H5S_SELECT_SET, start, nullptr, count, nullptr) < 0 ||
-                        H5Dwrite(dataset, H5T_NATIVE_UINT32, memspace.get(), filespace.get(), H5P_DEFAULT,
-                                 residual.data()) < 0) {
-                        return std::unexpected("H5Dwrite failed while appending field detail residual");
+                        H5Dwrite(dataset, storedType, memspace.get(), filespace.get(), H5P_DEFAULT,
+                                 tile.data()) < 0) {
+                        return std::unexpected("H5Dwrite failed while appending field detail");
                     }
                 }
             }
@@ -657,7 +693,7 @@ std::expected<void, std::string> FieldFrameSeriesWriter::writeFrame(std::uint32_
     if (auto r = appendScalar(impl.timeSecondsDataset, H5T_NATIVE_DOUBLE, &timeSeconds); !r) return r;
     if (auto r = appendScalar(impl.minEnergyDataset, H5T_NATIVE_FLOAT, &minEnergy); !r) return r;
     if (auto r = appendScalar(impl.maxEnergyDataset, H5T_NATIVE_FLOAT, &maxEnergy); !r) return r;
-    for (std::size_t component = 0; component < components.size(); ++component) {
+    for (std::size_t component = 0; storesComponents && component < components.size(); ++component) {
         if (auto r = appendScalar(impl.componentMinDataset[component], H5T_NATIVE_FLOAT,
                                   &componentMin[component]); !r) return r;
         if (auto r = appendScalar(impl.componentMaxDataset[component], H5T_NATIVE_FLOAT,

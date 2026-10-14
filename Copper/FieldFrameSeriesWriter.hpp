@@ -18,9 +18,26 @@
 
 namespace copper {
 
+/// How finely each stored full-resolution sample is kept. Float32 is lossless. The others store
+/// every value divided by its channel's own peak magnitude in that frame (see the format doc), so
+/// even half floats neither overflow on large E fields nor underflow on tiny energies.
+enum class FieldSamplePrecision : std::uint8_t { Int8, Int12, Float16, Float32 };
+
+/// Which full-resolution channels a series stores: the six signed E/H components, or only the
+/// combined energy density eps0*|E|^2 + mu0*|H|^2 (a sixth of the data, but no field direction or
+/// sign, so nothing that combines several excitations' fields).
+enum class FieldChannels : std::uint8_t { Components, Energy };
+
+struct FieldFrameStorage {
+    FieldSamplePrecision precision = FieldSamplePrecision::Float32;
+    FieldChannels channels = FieldChannels::Components;
+
+    bool operator==(const FieldFrameStorage&) const = default;
+};
+
 /// Writes one field frame-series file (one per simulation name + excited port -- see the format
-/// doc's own "File identity" section). Every `writeFrame()` call extends the file's six big
-/// component datasets by exactly one frame; there is no separate "flush"/"finish" step beyond
+/// doc's own "File identity" section). Every `writeFrame()` call extends the file's full-resolution
+/// datasets (six components, or one energy channel -- see Header::storage) by exactly one frame; there is no separate "flush"/"finish" step beyond
 /// close() (also run, best-effort, from the destructor) -- see the format doc's own "Streaming
 /// write / durability" section for why every `chunkFrames`-th frame already triggers an internal
 /// H5Fflush.
@@ -45,6 +62,8 @@ public:
         /// Full-resolution XY domain classification, x-fastest. Zero is external; non-zero is an
         /// active interior/CPML node. Empty means a conventional rectangular domain (all active).
         std::vector<std::uint8_t> domainXYClass;
+        /// How the full-resolution detail is stored. A version 4 file reads back as the default.
+        FieldFrameStorage storage;
     };
 
     /// Creates (truncating any existing file at `path`) and writes the static header/grid content

@@ -379,6 +379,103 @@ std::expected<void, std::string> writeSyntheticFrame(copper::FieldFrameSeriesWri
     XCTAssertFalse(result.has_value());
 }
 
+- (void)testQuantizedPrecisionsRoundTripWithinTheirResolution {
+    // Each stores value / (the component's peak magnitude in the frame), so the error bound is that
+    // peak over the format's full scale: half a step for the integers, 2^-11 relative for half floats.
+    const std::array<std::pair<copper::FieldSamplePrecision, float>, 3> precisions = {{
+        {copper::FieldSamplePrecision::Int8, 0.5F / 127.0F},
+        {copper::FieldSamplePrecision::Int12, 0.5F / 2047.0F},
+        {copper::FieldSamplePrecision::Float16, 1.0F / 2048.0F},
+    }};
+    for (const auto& [precision, relativeTolerance] : precisions) {
+        std::error_code ec;
+        std::filesystem::remove(_path, ec);
+        copper::FieldFrameSeriesWriter::Header header = makeHeader();
+        header.storage.precision = precision;
+        {
+            auto writer = copper::FieldFrameSeriesWriter::create(_path, header, /*chunkFrames=*/16);
+            XCTAssertTrue(writer.has_value(), @"create failed: %s", writer ? "" : writer.error().c_str());
+            if (!writer) return;
+            for (std::uint32_t f = 0; f < kFrameCount; ++f) {
+                XCTAssertTrue(writeSyntheticFrame(*writer, header, f).has_value());
+            }
+            XCTAssertTrue(writer->close().has_value());
+        }
+        auto reader = copper::FieldFrameSeriesReader::open(_path);
+        XCTAssertTrue(reader.has_value(), @"open failed: %s", reader ? "" : reader.error().c_str());
+        if (!reader) return;
+        XCTAssertTrue(reader->header().storage == header.storage);
+        for (std::uint32_t f = 0; f < kFrameCount; ++f) {
+            std::array<std::vector<float>, 6> c;
+            XCTAssertTrue(reader->readFrame(f, c[0], c[1], c[2], c[3], c[4], c[5]).has_value());
+            std::vector<std::uint32_t> cells(reader->previewHeader().nx * reader->previewHeader().ny *
+                                             reader->previewHeader().nz);
+            for (std::uint32_t i = 0; i < cells.size(); ++i) cells[i] = i;
+            auto details = reader->readPreviewCellDetails(f, cells);
+            XCTAssertTrue(details.has_value());
+            for (int component = 0; component < 6; ++component) {
+                float peak = 0.0F;
+                for (std::size_t i = 0; i < kCellCount; ++i) peak = std::max(peak, std::abs(valueFor(f, component, i)));
+                for (std::size_t i = 0; i < kCellCount; ++i) {
+                    XCTAssertEqualWithAccuracy(c[static_cast<std::size_t>(component)][i], valueFor(f, component, i),
+                                               peak * relativeTolerance * 1.0001F);
+                }
+                // The whole grid is one preview cell here, so its detail tile is the whole frame.
+                if (details && details->size() == 1) {
+                    XCTAssertEqual((*details)[0].components[static_cast<std::size_t>(component)],
+                                   c[static_cast<std::size_t>(component)]);
+                    XCTAssertTrue((*details)[0].energy.empty());
+                }
+            }
+        }
+    }
+}
+
+- (void)testEnergyOnlySeriesStoresEnergyWithoutComponents {
+    for (const auto precision : {copper::FieldSamplePrecision::Float32, copper::FieldSamplePrecision::Int8}) {
+        std::error_code ec;
+        std::filesystem::remove(_path, ec);
+        copper::FieldFrameSeriesWriter::Header header = makeHeader();
+        header.storage = {precision, copper::FieldChannels::Energy};
+        {
+            auto writer = copper::FieldFrameSeriesWriter::create(_path, header, /*chunkFrames=*/16);
+            XCTAssertTrue(writer.has_value());
+            if (!writer) return;
+            for (std::uint32_t f = 0; f < 3; ++f) XCTAssertTrue(writeSyntheticFrame(*writer, header, f).has_value());
+            XCTAssertTrue(writer->close().has_value());
+        }
+        auto reader = copper::FieldFrameSeriesReader::open(_path);
+        XCTAssertTrue(reader.has_value(), @"open failed: %s", reader ? "" : reader.error().c_str());
+        if (!reader) return;
+        XCTAssertTrue(reader->header().storage == header.storage);
+        XCTAssertEqual(reader->frameCount(), 3U);
+        XCTAssertFalse(reader->componentRange(copper::FieldComponent::Ex).has_value());
+
+        std::array<std::vector<float>, 6> c;
+        XCTAssertFalse(reader->readFrame(2, c[0], c[1], c[2], c[3], c[4], c[5]).has_value());
+        std::vector<float> previewEnergy;
+        XCTAssertTrue(reader->readPreviewFrame(2, previewEnergy, c[0], c[1], c[2], c[3], c[4], c[5]).has_value());
+        XCTAssertFalse(previewEnergy.empty());
+        for (const auto& component : c) XCTAssertTrue(component.empty());
+
+        auto details = reader->readPreviewCellDetails(2, {0});
+        XCTAssertTrue(details.has_value());
+        if (!details || details->size() != 1) return;
+        const auto& energy = (*details)[0].energy;
+        XCTAssertEqual(energy.size(), kCellCount);
+        XCTAssertTrue((*details)[0].components[0].empty());
+        const float peak = reader->maxEnergy(2);
+        const float tolerance = precision == copper::FieldSamplePrecision::Float32 ? peak * 1e-6F : peak * 0.5F / 255.0F * 1.0001F;
+        for (std::size_t i = 0; i < std::min(energy.size(), kCellCount); ++i) {
+            float eSq = 0.0F, hSq = 0.0F;
+            for (int component = 0; component < 3; ++component) eSq += valueFor(2, component, i) * valueFor(2, component, i);
+            for (int component = 3; component < 6; ++component) hSq += valueFor(2, component, i) * valueFor(2, component, i);
+            const float expected = 8.8541878128e-12F * eSq + 1.25663706212e-6F * hSq;
+            XCTAssertEqualWithAccuracy(energy[i], expected, tolerance);
+        }
+    }
+}
+
 - (void)testOpeningNonexistentFileReturnsError {
     auto reader = copper::FieldFrameSeriesReader::open(std::filesystem::temp_directory_path() /
                                                           "copper_tests_does_not_exist.h5");
