@@ -3,68 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 71;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		04B2B86F983C8C5A023DC90A /* CSPrimPolygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CCE6EA719787E74EB283C77C /* CSPrimPolygon.cpp */; };
-		0560A9A5F313EC206E39CB19 /* libCopperUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */; };
-		0B4414645139F4079F0425F2 /* fparser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2FAAD97A992A4EF608EE81B2 /* fparser.cc */; };
-		15B71A1A31538C5A4D47DDD6 /* CSModeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19107B02DF5B2334DFE2F7DB /* CSModeData.cpp */; };
-		1BDB3D5F5771515E9FC5EF7E /* tinystr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 645482BE133775AD0FEBA242 /* tinystr.cpp */; };
-		1BDBB50043583C924CC60B69 /* CSPropLorentzMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42BD6262E25FB3CA48DC0521 /* CSPropLorentzMaterial.cpp */; };
-		1CD4FD1DD6F27522E8A763DC /* CSPrimPolyhedron.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55D034266EC70D8C6EBE4621 /* CSPrimPolyhedron.cpp */; };
-		1F0B10E31305467EFE5AF213 /* CSPropConductingSheet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C632AFE5B95D415966502B2 /* CSPropConductingSheet.cpp */; };
-		2B28A64197EC34386A462A87 /* ParameterCoord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24B7335A2F71AEA6CA923AA9 /* ParameterCoord.cpp */; };
-		338991977E432253F5624470 /* CSPropDumpBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49380B939918173C5E163869 /* CSPropDumpBox.cpp */; };
-		3D1271193BE7F28210A32DC5 /* ContinuousStructure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2451E7CD12BD31F3818F94CE /* ContinuousStructure.cpp */; };
-		46D666BC9696E9651FCFEE31 /* libCSXCAD.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */; };
-		4CB26506BBA7E1DF51710EA0 /* CSPropMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35E032FD12157DD7436C060B /* CSPropMaterial.cpp */; };
-		4E5B0B1E62A9ACE0E3A67968 /* CSProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49663DFBA7D26ACD3593530A /* CSProperties.cpp */; };
-		4F0654CC2396B2A98E427EB2 /* CSPrimSphericalShell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53E42EE90820060F11B96EFB /* CSPrimSphericalShell.cpp */; };
-		509ABB995FDD2894AD97FA11 /* CSPropProbeBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2941FAC6E5079B742EA0677D /* CSPropProbeBox.cpp */; };
-		548FA834261D5A56090B9EA2 /* CSPrimSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 582E95673AF775E7C5A4EBEE /* CSPrimSphere.cpp */; };
-		54A8C107A2BE3850E7AD014B /* CSFunctionParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C8AB067F9A2BFC5184D54DD /* CSFunctionParser.cpp */; };
-		5B13B6D149D66B0CDC7F1E5F /* CSPropUnknown.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 621B998B5A6FAD0B88C1FA5C /* CSPropUnknown.cpp */; };
-		5B2B2E719D953507E90FA2CB /* CSRectGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D09307B1321F43E7A6B24545 /* CSRectGrid.cpp */; };
-		5D058B8AEACE7C4CC74982FD /* CSPropDispersiveMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 99BBF1C2A91DE6F8F90AD7C9 /* CSPropDispersiveMaterial.cpp */; };
 		5D63EC94AAAABA835D80AD23 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */; };
-		5DB92BABCB73E13DED4FEF42 /* ParameterObjects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DC26131EC2F82F313F707C9 /* ParameterObjects.cpp */; };
-		600611418B043A403CFAA81D /* CSPrimWire.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8EE7A287292801D969EBEE8 /* CSPrimWire.cpp */; };
-		62805560624895BE2386B34E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */; };
-		6289F839B13DD503D9DD5F82 /* CSPropDiscMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 62E84E2F8D9CDD378F82B722 /* CSPropDiscMaterial.cpp */; };
-		628E926FB70334167AA6A82C /* CSPrimMultiBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7DA55CD8B8F43603CBF7440 /* CSPrimMultiBox.cpp */; };
-		6508E1AC850EE3C9D7CBA455 /* CSPropLumpedElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DDD0FCF16EEA1323AE2971 /* CSPropLumpedElement.cpp */; };
-		66E58DD2CEF76934C15168FA /* CSPropDebyeMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7019BD9D40D2F7B488141B47 /* CSPropDebyeMaterial.cpp */; };
-		6C75C637755647DDC99161F9 /* CSPrimCylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7AF409E4E579731AAE2D895E /* CSPrimCylinder.cpp */; };
-		74E2D8EF6E322BE704C47559 /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F92AECB98E3B94079636305 /* tinyxml.cpp */; };
-		798E98E43B14B0F1B36C5243 /* libCopperUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */; };
-		7E592664D42967B0D22589FE /* CSObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 392A5304AAD3B0B36A195A28 /* CSObject.cpp */; };
-		827DA68E750A7B408EA42267 /* CSPrimBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5275AED038D13ECAAD4B5BBB /* CSPrimBox.cpp */; };
-		8A7C4526A1B0E8DD3B16DC03 /* CSPrimRotPoly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4F576FAAAAF9DD769E4F417 /* CSPrimRotPoly.cpp */; };
-		949750C162BE7358F4658DCD /* CSPropMetal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 659582DF355BC23285681D28 /* CSPropMetal.cpp */; };
-		99C5BDC165596DCE680D8546 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 459C7FABC7D20BF8ACCCE972 /* Cocoa.framework */; };
-		9BEF0DEE4F00C103AC5E4D16 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4CBA74CF3B707715FE6898 /* tinyxmlparser.cpp */; };
-		9CB4CC37F5DD0F0E4D814CCF /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0E6900AA5EA8F88D90AEA6C /* Accelerate.framework */; };
-		A032922B535CB11035EFD37A /* CSPropExcitation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E5374364FF616CAF2E4CEF11 /* CSPropExcitation.cpp */; };
 		A2FFB4D6253A22B65F2FFE3D /* Copper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91EC4B2021EEA20F36C13E8 /* Copper.framework */; };
-		A72DA55D4BB947D401CF90CC /* CSPrimitives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14403A9D7934B6D535ECEEEA /* CSPrimitives.cpp */; };
-		A76F16654E811644DA4D8F4E /* CSPrimUserDefined.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10A0633C3052ADF6DB48645B /* CSPrimUserDefined.cpp */; };
-		ACED1480CBA2AE28153FEA9E /* CSPrimPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6894DAA01911257A836872F /* CSPrimPoint.cpp */; };
-		B26D3E41B8AA3DC2A5FB6DA8 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88E41EBB8BD36FF23AA0C199 /* Metal.framework */; };
-		B6DE86419517456A7967274A /* CSPrimPolyhedronReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B7203E9A456149DB8FB9B633 /* CSPrimPolyhedronReader.cpp */; };
-		BB13EEF6C3174AFAD62548EA /* CSPropResBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAC355CC2A5EC58DE3DB901 /* CSPropResBox.cpp */; };
-		C50529848E056E3A52942D24 /* fpoptimizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 33AB50487990E79E3018A3BE /* fpoptimizer.cc */; };
-		C9DD33EA8887024C8CEB9BC4 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6EA5DB87FF6E02B73427F10F /* tinyxmlerror.cpp */; };
-		CCC56DD58C04AC99C0E9E174 /* CSPropAbsorbingBC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3E45A17E6C81E9F1E8851729 /* CSPropAbsorbingBC.cpp */; };
-		D0EE99D8F60401BE348D23A7 /* CSPrimLinPoly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED32FE3385B357DB995A992 /* CSPrimLinPoly.cpp */; };
-		D4349EA9904C838480776FCA /* CSPrimCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD8AEEE6A9823DF442C7CA2B /* CSPrimCurve.cpp */; };
-		D936249311D82577FC9686CB /* CSPrimCylindricalShell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AB9A94C62AE5115902EDA /* CSPrimCylindricalShell.cpp */; };
 		DD97080C84BB30A0720C75BC /* libCSXCAD.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B5FA5D05688308C3CEF94DD /* libCSXCAD.dylib */; };
-		E4184CC82B9F9EA2C02933F3 /* CSTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09DDE61CE07C7206D4338495 /* CSTransform.cpp */; };
-		E5299B11E9C8848E00AD5152 /* CSBackgroundMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B68DE0FB3FC06117F6CB6E96 /* CSBackgroundMaterial.cpp */; };
-		EABA01871574BD330EFC2B5D /* CSSpatialIndex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 373F49427E55B9CD2B6D0100 /* CSSpatialIndex.cpp */; };
-		F7E70C035A56A1EE3D83A307 /* CSUseful.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E85D2C7AFD6BC42B1023E25 /* CSUseful.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,13 +41,6 @@
 			remoteGlobalIDString = 436BD46808618ED0B9E3983D;
 			remoteInfo = CSXCAD;
 		};
-		EDEA6E8B59FAE0D9C7373815 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 547F02E1E022D27E93E11471 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4A8AA87DCFAFA02E03A63665;
-			remoteInfo = CopperUtils;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -124,9 +62,9 @@
 		2941FAC6E5079B742EA0677D /* CSPropProbeBox.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropProbeBox.cpp; sourceTree = "<group>"; };
 		2E6CC06E9F87669481746998 /* CSPrimSphere.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimSphere.h; sourceTree = "<group>"; };
 		2E85D2C7AFD6BC42B1023E25 /* CSUseful.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSUseful.cpp; sourceTree = "<group>"; };
-		2FAAD97A992A4EF608EE81B2 /* fparser.cc */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser.cc; sourceTree = "<group>"; };
+		2FAAD97A992A4EF608EE81B2 /* fparser.cc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = fparser.cc; sourceTree = "<group>"; };
 		31DDD0FCF16EEA1323AE2971 /* CSPropLumpedElement.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropLumpedElement.cpp; sourceTree = "<group>"; };
-		33AB50487990E79E3018A3BE /* fpoptimizer.cc */ = {isa = PBXFileReference; includeInIndex = 1; path = fpoptimizer.cc; sourceTree = "<group>"; };
+		33AB50487990E79E3018A3BE /* fpoptimizer.cc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = fpoptimizer.cc; sourceTree = "<group>"; };
 		35E032FD12157DD7436C060B /* CSPropMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropMaterial.cpp; sourceTree = "<group>"; };
 		35E23CA6597761F2C26CE848 /* CSPrimPoint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPoint.h; sourceTree = "<group>"; };
 		373F49427E55B9CD2B6D0100 /* CSSpatialIndex.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSSpatialIndex.cpp; sourceTree = "<group>"; };
@@ -153,7 +91,7 @@
 		5C0AB9A94C62AE5115902EDA /* CSPrimCylindricalShell.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimCylindricalShell.cpp; sourceTree = "<group>"; };
 		5C896CA840676E229D619DA3 /* CSPrimPolygon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPolygon.h; sourceTree = "<group>"; };
 		5DC26131EC2F82F313F707C9 /* ParameterObjects.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParameterObjects.cpp; sourceTree = "<group>"; };
-		5ED73BABAA0671F6FCD02983 /* fparser_gmpint.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser_gmpint.hh; sourceTree = "<group>"; };
+		5ED73BABAA0671F6FCD02983 /* fparser_gmpint.hh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = fparser_gmpint.hh; sourceTree = "<group>"; };
 		621B998B5A6FAD0B88C1FA5C /* CSPropUnknown.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropUnknown.cpp; sourceTree = "<group>"; };
 		62E84E2F8D9CDD378F82B722 /* CSPropDiscMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropDiscMaterial.cpp; sourceTree = "<group>"; };
 		645482BE133775AD0FEBA242 /* tinystr.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = tinystr.cpp; sourceTree = "<group>"; };
@@ -163,12 +101,12 @@
 		7019BD9D40D2F7B488141B47 /* CSPropDebyeMaterial.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPropDebyeMaterial.cpp; sourceTree = "<group>"; };
 		753D0C79263BE7D365068E5B /* CSPrimRotPoly.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimRotPoly.h; sourceTree = "<group>"; };
 		79E9BE38335DB9DB3CAFD9AC /* CSPropDispersiveMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropDispersiveMaterial.h; sourceTree = "<group>"; };
-		7A026BC10D4E6EBFBDA8C7E6 /* copper_field_storage_experiments.md */ = {isa = PBXFileReference; includeInIndex = 1; path = copper_field_storage_experiments.md; sourceTree = "<group>"; };
+		7A026BC10D4E6EBFBDA8C7E6 /* copper_field_storage_experiments.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = copper_field_storage_experiments.md; sourceTree = "<group>"; };
 		7AF409E4E579731AAE2D895E /* CSPrimCylinder.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimCylinder.cpp; sourceTree = "<group>"; };
 		7BCB52FBE0FB964B0641E104 /* ParameterCoord.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParameterCoord.h; sourceTree = "<group>"; };
 		7E00681EF23C96E69CD24446 /* CSPropProbeBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropProbeBox.h; sourceTree = "<group>"; };
 		7F92AECB98E3B94079636305 /* tinyxml.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml.cpp; sourceTree = "<group>"; };
-		829A139D8DACEC6B975E19F8 /* field_frame_series_format.md */ = {isa = PBXFileReference; includeInIndex = 1; path = field_frame_series_format.md; sourceTree = "<group>"; };
+		829A139D8DACEC6B975E19F8 /* field_frame_series_format.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = field_frame_series_format.md; sourceTree = "<group>"; };
 		835733E2D242DE2DBCB24030 /* CSPrimMultiBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimMultiBox.h; sourceTree = "<group>"; };
 		841D0FB5789F0F1C8C57EB75 /* CSPrimCylindricalShell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimCylindricalShell.h; sourceTree = "<group>"; };
 		869E97FF3C1F876E3F9EB9BA /* CSPrimSphericalShell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimSphericalShell.h; sourceTree = "<group>"; };
@@ -185,7 +123,7 @@
 		A0E6900AA5EA8F88D90AEA6C /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		A5DD6DF8EC200E1F05E36A53 /* libCopperUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCopperUtils.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA17D884E3FFD300A56BD57B /* CSXCADLogging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSXCADLogging.h; sourceTree = "<group>"; };
-		AA23E245E89A6CE7E53BA045 /* fpconfig.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fpconfig.hh; sourceTree = "<group>"; };
+		AA23E245E89A6CE7E53BA045 /* fpconfig.hh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = fpconfig.hh; sourceTree = "<group>"; };
 		ADB7AFD53555E82B112ED67E /* CSPrimPolyhedronReader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimPolyhedronReader.h; sourceTree = "<group>"; };
 		B4612EC255D295111FB95110 /* DependencyCheck.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DependencyCheck.h; sourceTree = "<group>"; };
 		B4F576FAAAAF9DD769E4F417 /* CSPrimRotPoly.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimRotPoly.cpp; sourceTree = "<group>"; };
@@ -199,14 +137,14 @@
 		BC6D3573C7FB15044236A080 /* CSPropResBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropResBox.h; sourceTree = "<group>"; };
 		BD8AEEE6A9823DF442C7CA2B /* CSPrimCurve.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimCurve.cpp; sourceTree = "<group>"; };
 		C02930E4233F720191946A92 /* CSObject.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSObject.h; sourceTree = "<group>"; };
-		C3969925EBD045A8743AD587 /* fparser_mpfr.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser_mpfr.hh; sourceTree = "<group>"; };
+		C3969925EBD045A8743AD587 /* fparser_mpfr.hh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = fparser_mpfr.hh; sourceTree = "<group>"; };
 		C9B1607C31917DAEA552D93C /* CSPrimBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimBox.h; sourceTree = "<group>"; };
 		CC195ABA9749F0A1F741A458 /* CSPropExcitation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropExcitation.h; sourceTree = "<group>"; };
 		CCC715505E3820CE055416B0 /* CSBackgroundMaterial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSBackgroundMaterial.h; sourceTree = "<group>"; };
 		CCE6EA719787E74EB283C77C /* CSPrimPolygon.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimPolygon.cpp; sourceTree = "<group>"; };
 		D09307B1321F43E7A6B24545 /* CSRectGrid.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSRectGrid.cpp; sourceTree = "<group>"; };
 		D2B543061B247AAEB046FC4D /* CSPrimLinPoly.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPrimLinPoly.h; sourceTree = "<group>"; };
-		D7CC1595E4CB5473475095EE /* fparser.hh */ = {isa = PBXFileReference; includeInIndex = 1; path = fparser.hh; sourceTree = "<group>"; };
+		D7CC1595E4CB5473475095EE /* fparser.hh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = fparser.hh; sourceTree = "<group>"; };
 		D7DA55CD8B8F43603CBF7440 /* CSPrimMultiBox.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CSPrimMultiBox.cpp; sourceTree = "<group>"; };
 		D7DB6409AA3F5CE20D48A7B9 /* CSPropUnknown.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CSPropUnknown.h; sourceTree = "<group>"; };
 		D91EC4B2021EEA20F36C13E8 /* Copper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Copper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,49 +157,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D4EC3E253FD202A57E4579CF /* Exceptions for "CopperUtils" folder in "CopperUtils" target */ = {
+		D4EC3E253FD202A57E4579CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
 				logging.hpp,
 			);
 			target = 4A8AA87DCFAFA02E03A63665 /* CopperUtils */;
 		};
-		F922E6F4E3ED125A39C205B0 /* Exceptions for "Copper" folder in "Copper" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			additionalCompilerFlagsByRelativePath = {
-				Internal/CopperEngine.mm = "-fobjc-arc-exceptions";
-			};
-			publicHeaders = (
-				Copper.h,
-			);
-			target = 3818463DDAC498C89C93C21E /* Copper */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		1D5ADA8DEB05471CFA59E84B /* CopperTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			path = CopperTests;
-			sourceTree = "<group>";
-		};
-		3E706D59F457756B1B57D0B5 /* CopperUtils */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				D4EC3E253FD202A57E4579CF /* Exceptions for "CopperUtils" folder in "CopperUtils" target */,
-			);
-			path = CopperUtils;
-			sourceTree = "<group>";
-		};
-		A27B24154E025DFC3AFA3C7D /* Copper */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				F922E6F4E3ED125A39C205B0 /* Exceptions for "Copper" folder in "Copper" target */,
-			);
-			path = Copper;
-			sourceTree = "<group>";
-		};
+		1D5ADA8DEB05471CFA59E84B /* CopperTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CopperTests; sourceTree = "<group>"; };
+		3E706D59F457756B1B57D0B5 /* CopperUtils */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (D4EC3E253FD202A57E4579CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = CopperUtils; sourceTree = "<group>"; };
+		A27B24154E025DFC3AFA3C7D /* Copper */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Copper; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -272,18 +180,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2F7657AE2D383104F1ACBF48 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				99C5BDC165596DCE680D8546 /* Cocoa.framework in Frameworks */,
-				9CB4CC37F5DD0F0E4D814CCF /* Accelerate.framework in Frameworks */,
-				B26D3E41B8AA3DC2A5FB6DA8 /* Metal.framework in Frameworks */,
-				798E98E43B14B0F1B36C5243 /* libCopperUtils.a in Frameworks */,
-				46D666BC9696E9651FCFEE31 /* libCSXCAD.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		67728548F88BC880BB927985 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -291,15 +187,6 @@
 				5D63EC94AAAABA835D80AD23 /* Cocoa.framework in Frameworks */,
 				A2FFB4D6253A22B65F2FFE3D /* Copper.framework in Frameworks */,
 				DD97080C84BB30A0720C75BC /* libCSXCAD.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7427C70865376015BBCC9006 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				62805560624895BE2386B34E /* Cocoa.framework in Frameworks */,
-				0560A9A5F313EC206E39CB19 /* libCopperUtils.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,7 +224,6 @@
 				7A026BC10D4E6EBFBDA8C7E6 /* copper_field_storage_experiments.md */,
 				829A139D8DACEC6B975E19F8 /* field_frame_series_format.md */,
 			);
-			name = docs;
 			path = docs;
 			sourceTree = "<group>";
 		};
@@ -347,7 +233,6 @@
 				1D3C154A86426B644D3566C7 /* BuildPaths.xcconfig */,
 				B4612EC255D295111FB95110 /* DependencyCheck.h */,
 			);
-			name = Config;
 			path = Config;
 			sourceTree = "<group>";
 		};
@@ -372,7 +257,6 @@
 				AA23E245E89A6CE7E53BA045 /* fpconfig.hh */,
 				33AB50487990E79E3018A3BE /* fpoptimizer.cc */,
 			);
-			name = fparser;
 			path = fparser;
 			sourceTree = "<group>";
 		};
@@ -499,27 +383,12 @@
 				6EA5DB87FF6E02B73427F10F /* tinyxmlerror.cpp */,
 				8B4CBA74CF3B707715FE6898 /* tinyxmlparser.cpp */,
 			);
-			name = tinyxml;
 			path = tinyxml;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		314FBA1551C44E96938BC1FC /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3A67E384C28782DBA66077B3 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C366C5E0FE5084F5B264448C /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -530,6 +399,64 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
+		3818463DDAC498C89C93C21E /* Copper */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SRCROOT)/Scripts/build_with_cmake.sh\" Copper \"$(CONFIGURATION)\" \"$(BUILT_PRODUCTS_DIR)\"";
+			buildConfigurationList = 5B465758AC6A6C14E881C7E6 /* Build configuration list for PBXLegacyTarget "Copper" */;
+			buildPhases = (
+			);
+			buildToolPath = /bin/sh;
+			buildWorkingDirectory = "$(SRCROOT)";
+			dependencies = (
+				5536BBE3A53FDD9EDA86154E /* PBXTargetDependency */,
+			);
+			name = Copper;
+			passBuildSettingsInEnvironment = 1;
+			productName = Copper;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSHumanReadableCopyright</key>
+	<string></string>
+</dict>
+</plist>
+";
+		};
+		436BD46808618ED0B9E3983D /* CSXCAD */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SRCROOT)/Scripts/build_with_cmake.sh\" CSXCAD \"$(CONFIGURATION)\" \"$(BUILT_PRODUCTS_DIR)\"";
+			buildConfigurationList = 42EB51A262826E093D63E46E /* Build configuration list for PBXLegacyTarget "CSXCAD" */;
+			buildPhases = (
+			);
+			buildToolPath = /bin/sh;
+			buildWorkingDirectory = "$(SRCROOT)";
+			dependencies = (
+				E4CEF3E02FF62C6CC025F7EB /* PBXTargetDependency */,
+			);
+			name = CSXCAD;
+			passBuildSettingsInEnvironment = 1;
+			productName = CSXCAD;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXNativeTarget section */
 		0F0374D92E735F41CCC00550 /* CopperTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8D2ABDE8071C6E947768BF76 /* Build configuration list for PBXNativeTarget "CopperTests" */;
@@ -552,35 +479,6 @@
 			productReference = 50DA849D124607C4D7B1A46C /* CopperTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		3818463DDAC498C89C93C21E /* Copper */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "\"$(SRCROOT)/Scripts/build_with_cmake.sh\" Copper \"$(CONFIGURATION)\" \"$(BUILT_PRODUCTS_DIR)\"";
-			buildConfigurationList = 5B465758AC6A6C14E881C7E6 /* Build configuration list for PBXNativeTarget "Copper" */;
-			buildToolPath = /bin/sh;
-			buildWorkingDirectory = "$(SRCROOT)";
-			dependencies = (
-				5536BBE3A53FDD9EDA86154E /* PBXTargetDependency */,
-			);
-			name = Copper;
-			passBuildSettingsInEnvironment = 1;
-			productName = Copper;
-		};
-		436BD46808618ED0B9E3983D /* CSXCAD */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "\"$(SRCROOT)/Scripts/build_with_cmake.sh\" CSXCAD \"$(CONFIGURATION)\" \"$(BUILT_PRODUCTS_DIR)\"";
-			buildConfigurationList = 42EB51A262826E093D63E46E /* Build configuration list for PBXNativeTarget "CSXCAD" */;
-			buildToolPath = /bin/sh;
-			buildWorkingDirectory = "$(SRCROOT)";
-			dependencies = (
-				E4CEF3E02FF62C6CC025F7EB /* PBXTargetDependency */,
-			);
-			name = CSXCAD;
-			passBuildSettingsInEnvironment = 1;
-			productName = CSXCAD;
-		};
-/* End PBXLegacyTarget section */
-
-/* Begin PBXNativeTarget section */
 		4A8AA87DCFAFA02E03A63665 /* CopperUtils */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E7ABFE65EB2957701056E00B /* Build configuration list for PBXNativeTarget "CopperUtils" */;
@@ -634,8 +532,6 @@
 				Base,
 			);
 			mainGroup = 119D4A093C274FEEEEAA71E5;
-			minimizedProjectReferenceProxies = 0;
-			preferredProjectObjectVersion = 100;
 			productRefGroup = 1BB2B2034F4CC418058A920E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -649,13 +545,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		B12834D3E9FEDF3FFBD0F0B0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F0C9107AE45A0129AF2E1418 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -673,69 +562,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		70BE0A4C8B96A5165DA31264 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E5299B11E9C8848E00AD5152 /* CSBackgroundMaterial.cpp in Sources */,
-				54A8C107A2BE3850E7AD014B /* CSFunctionParser.cpp in Sources */,
-				15B71A1A31538C5A4D47DDD6 /* CSModeData.cpp in Sources */,
-				7E592664D42967B0D22589FE /* CSObject.cpp in Sources */,
-				827DA68E750A7B408EA42267 /* CSPrimBox.cpp in Sources */,
-				D4349EA9904C838480776FCA /* CSPrimCurve.cpp in Sources */,
-				6C75C637755647DDC99161F9 /* CSPrimCylinder.cpp in Sources */,
-				D936249311D82577FC9686CB /* CSPrimCylindricalShell.cpp in Sources */,
-				D0EE99D8F60401BE348D23A7 /* CSPrimLinPoly.cpp in Sources */,
-				628E926FB70334167AA6A82C /* CSPrimMultiBox.cpp in Sources */,
-				ACED1480CBA2AE28153FEA9E /* CSPrimPoint.cpp in Sources */,
-				04B2B86F983C8C5A023DC90A /* CSPrimPolygon.cpp in Sources */,
-				1CD4FD1DD6F27522E8A763DC /* CSPrimPolyhedron.cpp in Sources */,
-				B6DE86419517456A7967274A /* CSPrimPolyhedronReader.cpp in Sources */,
-				8A7C4526A1B0E8DD3B16DC03 /* CSPrimRotPoly.cpp in Sources */,
-				548FA834261D5A56090B9EA2 /* CSPrimSphere.cpp in Sources */,
-				4F0654CC2396B2A98E427EB2 /* CSPrimSphericalShell.cpp in Sources */,
-				A76F16654E811644DA4D8F4E /* CSPrimUserDefined.cpp in Sources */,
-				600611418B043A403CFAA81D /* CSPrimWire.cpp in Sources */,
-				A72DA55D4BB947D401CF90CC /* CSPrimitives.cpp in Sources */,
-				CCC56DD58C04AC99C0E9E174 /* CSPropAbsorbingBC.cpp in Sources */,
-				1F0B10E31305467EFE5AF213 /* CSPropConductingSheet.cpp in Sources */,
-				66E58DD2CEF76934C15168FA /* CSPropDebyeMaterial.cpp in Sources */,
-				6289F839B13DD503D9DD5F82 /* CSPropDiscMaterial.cpp in Sources */,
-				5D058B8AEACE7C4CC74982FD /* CSPropDispersiveMaterial.cpp in Sources */,
-				338991977E432253F5624470 /* CSPropDumpBox.cpp in Sources */,
-				A032922B535CB11035EFD37A /* CSPropExcitation.cpp in Sources */,
-				1BDBB50043583C924CC60B69 /* CSPropLorentzMaterial.cpp in Sources */,
-				6508E1AC850EE3C9D7CBA455 /* CSPropLumpedElement.cpp in Sources */,
-				4CB26506BBA7E1DF51710EA0 /* CSPropMaterial.cpp in Sources */,
-				949750C162BE7358F4658DCD /* CSPropMetal.cpp in Sources */,
-				509ABB995FDD2894AD97FA11 /* CSPropProbeBox.cpp in Sources */,
-				BB13EEF6C3174AFAD62548EA /* CSPropResBox.cpp in Sources */,
-				5B13B6D149D66B0CDC7F1E5F /* CSPropUnknown.cpp in Sources */,
-				4E5B0B1E62A9ACE0E3A67968 /* CSProperties.cpp in Sources */,
-				5B2B2E719D953507E90FA2CB /* CSRectGrid.cpp in Sources */,
-				EABA01871574BD330EFC2B5D /* CSSpatialIndex.cpp in Sources */,
-				E4184CC82B9F9EA2C02933F3 /* CSTransform.cpp in Sources */,
-				F7E70C035A56A1EE3D83A307 /* CSUseful.cpp in Sources */,
-				3D1271193BE7F28210A32DC5 /* ContinuousStructure.cpp in Sources */,
-				2B28A64197EC34386A462A87 /* ParameterCoord.cpp in Sources */,
-				5DB92BABCB73E13DED4FEF42 /* ParameterObjects.cpp in Sources */,
-				0B4414645139F4079F0425F2 /* fparser.cc in Sources */,
-				C50529848E056E3A52942D24 /* fpoptimizer.cc in Sources */,
-				1BDB3D5F5771515E9FC5EF7E /* tinystr.cpp in Sources */,
-				74E2D8EF6E322BE704C47559 /* tinyxml.cpp in Sources */,
-				C9DD33EA8887024C8CEB9BC4 /* tinyxmlerror.cpp in Sources */,
-				9BEF0DEE4F00C103AC5E4D16 /* tinyxmlparser.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C08AFBDF0BE39F82DF83ADB5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C8651569F259C92FA5110967 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -745,12 +572,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		010D1F32FD7BEC49B75DF5A6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = CopperUtils;
-			target = 4A8AA87DCFAFA02E03A63665 /* CopperUtils */;
-			targetProxy = EDEA6E8B59FAE0D9C7373815 /* PBXContainerItemProxy */;
-		};
 		5536BBE3A53FDD9EDA86154E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = CSXCAD;
@@ -1281,7 +1102,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		42EB51A262826E093D63E46E /* Build configuration list for PBXNativeTarget "CSXCAD" */ = {
+		42EB51A262826E093D63E46E /* Build configuration list for PBXLegacyTarget "CSXCAD" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9D628979E196CBBD37ABD36D /* Release */,
@@ -1290,7 +1111,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5B465758AC6A6C14E881C7E6 /* Build configuration list for PBXNativeTarget "Copper" */ = {
+		5B465758AC6A6C14E881C7E6 /* Build configuration list for PBXLegacyTarget "Copper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E382C37B5FE17F1A15824236 /* Release */,
